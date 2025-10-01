@@ -1,0 +1,52 @@
+{
+  "name": "craftcms/boilerplate",
+  "description": "Craft CMS Boilerplate with Vite, TailwindCSS, and Alpine.js",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "project"
+  ],
+  "license": "MIT",
+  "homepage": "https://craftcms.com/",
+  "type": "project",
+  "support": {
+    "email": "support@craftcms.com",
+    "issues": "https://github.com/craftcms/cms/issues",
+    "forum": "https://craftcms.stackexchange.com/",
+    "source": "https://github.com/craftcms/cms",
+    "docs": "https://craftcms.com/docs",
+    "rss": "https://craftcms.com/changelog.rss"
+  },
+  "require": {
+    "php": ">=8.2",
+    "craftcms/cms": "^5.0.0",
+    "vlucas/phpdotenv": "^5.4.0",
+    "nystudio107/craft-vite": "^5.0.0",
+    "nystudio107/craft-seomatic": "^5.0.0"
+  },
+  "require-dev": {
+    "yiisoft/yii2-shell": "^2.0.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "modules\\": "modules/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    },
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.2"
+    }
+  },
+  "scripts": {
+    "post-create-project-cmd": [
+      "@php craft setup/welcome"
+    ]
+  }
+}
