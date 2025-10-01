@@ -5,10 +5,10 @@ use craft\helpers\App;
 return [
     'devServerPublic' => 'http://localhost:3000',
     'serverPublic' => '/',
-    'useDevServer' => true,
+    'useDevServer' => App::env('CRAFT_ENVIRONMENT') === 'development',
     'manifestPath' => '@webroot/.vite/manifest.json',
     'devServerInternal' => 'http://host.docker.internal:3000',
-    'checkDevServer' => false,
+    'checkDevServer' => true,
     'errorEntry' => '',
     'includeReactRefreshShim' => false,
     'includeModulePreloadShim' => true,

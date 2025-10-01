@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* TEST: This should make the body have a red border if CSS is loading */
+body {
+  border: 5px solid red !important;
+}
+
 /* Custom base styles */
 @layer base {
   html {

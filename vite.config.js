@@ -22,10 +22,13 @@ export default defineConfig(({ command, mode }) => {
       open: false,
       // Disable HTTPS for now to avoid certificate issues
       https: false,
-      // Allow all origins
+      // Allow all origins and methods
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
+      cors: true,
       // HMR configuration - use WebSocket for HTTP
       hmr: {
         protocol: 'ws',
