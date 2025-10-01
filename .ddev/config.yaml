@@ -33,9 +33,6 @@ web_environment:
 nginx_config_overrides:
 - .ddev/nginx/nginx-site.conf
 
-# Use custom SSL certificates if they exist
-# This will be configured by setup.sh if mkcert is available
-
 # Hooks - only run if files exist to avoid setup failures
 hooks:
   post-start:

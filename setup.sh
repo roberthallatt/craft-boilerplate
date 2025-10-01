@@ -183,14 +183,8 @@ if command -v mkcert &> /dev/null; then
     
     # Configure DDEV to use custom SSL certificates
     print_status "Configuring DDEV to use custom SSL certificates..."
-    cat >> .ddev/config.yaml << EOF
-
-# Custom SSL certificates (added by setup.sh)
-additional_hostnames:
-- localhost
-use_dns_when_possible: true
-# DDEV will automatically detect and use certificates in .ddev/certs/
-EOF
+    # DDEV will automatically detect and use certificates in .ddev/certs/
+    # No additional configuration needed as additional_hostnames and use_dns_when_possible are already set
     
     # Configure Vite to use HTTPS with mkcert certificates
     print_status "Configuring Vite for HTTPS development..."
