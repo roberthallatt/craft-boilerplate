@@ -171,11 +171,26 @@ if command -v mkcert &> /dev/null; then
     mkcert -install
     print_success "Certificate authority installed - SSL certificates will be trusted by browsers"
     
-    # Create trusted certificates for localhost
+    # Create trusted certificates for localhost and DDEV domain
     print_status "Creating trusted SSL certificates for development..."
     mkdir -p .ddev/certs
-    mkcert -key-file .ddev/certs/localhost-key.pem -cert-file .ddev/certs/localhost.pem localhost 127.0.0.1 ::1
-    print_success "SSL certificates created for localhost"
+    mkcert -key-file .ddev/certs/localhost-key.pem -cert-file .ddev/certs/localhost.pem localhost 127.0.0.1 ::1 $PROJECT_NAME.ddev.site
+    
+    # Also create certificates with the standard DDEV naming for automatic detection
+    mkcert -key-file .ddev/certs/$PROJECT_NAME.ddev.site-key.pem -cert-file .ddev/certs/$PROJECT_NAME.ddev.site.pem $PROJECT_NAME.ddev.site localhost 127.0.0.1 ::1
+    
+    print_success "SSL certificates created for localhost and $PROJECT_NAME.ddev.site"
+    
+    # Configure DDEV to use custom SSL certificates
+    print_status "Configuring DDEV to use custom SSL certificates..."
+    cat >> .ddev/config.yaml << EOF
+
+# Custom SSL certificates (added by setup.sh)
+additional_hostnames:
+- localhost
+use_dns_when_possible: true
+# DDEV will automatically detect and use certificates in .ddev/certs/
+EOF
     
     # Configure Vite to use HTTPS with mkcert certificates
     print_status "Configuring Vite for HTTPS development..."
@@ -184,7 +199,14 @@ if command -v mkcert &> /dev/null; then
     VITE_HTTPS_ENABLED="true"
 else
     print_warning "mkcert not found - configuring Vite for HTTP development"
-    print_warning "For better security, install mkcert and re-run setup"
+    print_warning "For trusted SSL certificates, install mkcert:"
+    echo ""
+    echo "  macOS:   brew install mkcert"
+    echo "  Ubuntu:  sudo apt install mkcert"
+    echo "  Other:   https://github.com/FiloSottile/mkcert#installation"
+    echo ""
+    print_warning "Then re-run: ./setup.sh"
+    echo ""
     
     # Configure Vite to use HTTP without certificates
     VITE_DEV_SERVER_PUBLIC="http://localhost:3030"
@@ -343,44 +365,55 @@ chmod -R 755 web/
 chmod -R 755 storage/
 chmod +x setup.sh
 
+# Determine the correct protocol based on SSL setup
+if [ "$VITE_HTTPS_ENABLED" = "true" ]; then
+    VITE_URL="https://localhost:3030"
+    SSL_STATUS="✅ Trusted SSL certificates"
+else
+    VITE_URL="http://localhost:3030"
+    SSL_STATUS="⚠️  HTTP only (install mkcert for SSL)"
+fi
+
 print_success "Setup complete!"
 echo ""
-echo "🎉 Your Craft CMS boilerplate is ready!"
+echo "🎉 Your Craft CMS site is ready!"
 echo "======================================"
 echo ""
-echo "📋 Next steps:"
-echo "1. Visit your site:"
-echo "   • https://$PROJECT_NAME.ddev.site"
-echo "   • https://localhost:3001 (Browser-sync with live reload)"
-echo "2. Admin panel:"
+echo "🌐 Access your site:"
+if [ "$VITE_HTTPS_ENABLED" = "true" ]; then
+    echo "   • https://$PROJECT_NAME.ddev.site (Main site - ✅ Trusted SSL)"
+    echo "   • $VITE_URL (Vite dev server - ✅ Trusted SSL)"
+else
+    echo "   • https://$PROJECT_NAME.ddev.site (Main site - ⚠️ Browser warnings)"
+    echo "   • $VITE_URL (Vite dev server - HTTP only)"
+fi
+echo ""
+echo "🔐 Admin panel:"
 echo "   • https://$PROJECT_NAME.ddev.site/admin"
 echo "   • Username: admin"
 echo "   • Password: password"
 echo ""
 echo "🛠️  Development commands:"
-echo "• npm run dev          - Start development with hot reload"
+echo "• npm run dev          - Start Vite dev server with HMR"
 echo "• npm run build        - Build for production"
-echo "• ddev craft           - Run Craft CLI commands"
-echo "• ddev stop            - Stop the development environment"
+echo "• ddev start/stop      - Control DDEV environment"
+echo ""
+echo "📝 Development workflow:"
+echo "1. Run 'npm run dev' to start Vite dev server"
+echo "2. Visit https://$PROJECT_NAME.ddev.site for your site"
+echo "3. CSS/JS changes will hot-reload automatically"
 echo ""
 echo "📁 Important files:"
 echo "• templates/           - Twig templates"
 echo "• src/css/app.scss     - Main stylesheet"
 echo "• src/js/app.js        - Main JavaScript file"
-echo "• config/              - Craft CMS configuration"
 echo ""
-
-# Add SSL certificate note based on mkcert availability
-if command -v mkcert &> /dev/null; then
-    echo "🔒 SSL certificates are trusted by your browser (mkcert installed)"
-    echo "   • https://$PROJECT_NAME.ddev.site - DDEV site (trusted)"
-    echo "   • https://localhost:3001 - Browser-sync (trusted)"
-else
-    echo "🔒 SSL Note: You may see browser warnings for HTTPS URLs"
-    echo "   • https://$PROJECT_NAME.ddev.site - Click 'Advanced' → 'Proceed'"
-    echo "   • https://localhost:3001 - Browser-sync may show warnings"
-    echo "   To fix: brew install mkcert && mkcert -install && ./setup.sh"
+if [ "$VITE_HTTPS_ENABLED" = "false" ]; then
+    echo "💡 Pro tip: Install mkcert for trusted SSL certificates:"
+    echo "   brew install mkcert && ./setup.sh"
+    echo ""
 fi
+echo "Happy coding! 🚀"
 echo ""
 
 print_success "Happy coding! 🚀"
