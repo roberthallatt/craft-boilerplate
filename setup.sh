@@ -188,8 +188,8 @@ if command -v mkcert &> /dev/null; then
     
     # Configure Vite to use HTTPS with mkcert certificates
     print_status "Configuring Vite for HTTPS development..."
-    VITE_DEV_SERVER_PUBLIC="https://localhost:3000"
-    VITE_DEV_SERVER_INTERNAL="https://localhost:3000"
+    VITE_DEV_SERVER_PUBLIC="http://localhost:3000"
+    VITE_DEV_SERVER_INTERNAL="http://localhost:3000"
     VITE_HTTPS_ENABLED="true"
 else
     print_warning "mkcert not found - configuring Vite for HTTP development"
