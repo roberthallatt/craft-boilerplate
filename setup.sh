@@ -171,7 +171,7 @@ if command -v mkcert &> /dev/null; then
     mkcert -install
     print_success "Certificate authority installed - SSL certificates will be trusted by browsers"
     
-    # Create trusted certificates for localhost (for Browser-sync)
+    # Create trusted certificates for localhost
     print_status "Creating trusted SSL certificates for development..."
     mkdir -p .ddev/certs
     mkcert -key-file .ddev/certs/localhost-key.pem -cert-file .ddev/certs/localhost.pem localhost 127.0.0.1 ::1
