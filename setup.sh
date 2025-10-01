@@ -243,17 +243,39 @@ else
     print_warning ".env file already exists, skipping creation"
 fi
 
+# Install dependencies before starting DDEV to avoid hook failures
+print_status "Installing dependencies locally first..."
+
+# Install Composer dependencies locally if composer is available
+if command -v composer &> /dev/null; then
+    print_status "Installing PHP dependencies locally..."
+    composer install --no-interaction
+else
+    print_warning "Composer not found locally - will install via DDEV after start"
+fi
+
+# Install Node.js dependencies locally if npm is available
+if command -v npm &> /dev/null; then
+    print_status "Installing Node.js dependencies locally..."
+    npm install
+else
+    print_warning "npm not found locally - will install via DDEV after start"
+fi
+
 # Start DDEV
 print_status "Starting DDEV environment..."
 ddev start
 
-# Install Composer dependencies
-print_status "Installing PHP dependencies..."
-ddev composer install
+# Install any missing dependencies via DDEV if local installation failed
+if [ ! -d "vendor" ]; then
+    print_status "Installing PHP dependencies via DDEV..."
+    ddev composer install
+fi
 
-# Install Node.js dependencies
-print_status "Installing Node.js dependencies..."
-npm install
+if [ ! -d "node_modules" ]; then
+    print_status "Installing Node.js dependencies via DDEV..."
+    ddev npm install
+fi
 
 # Create Craft console command
 print_status "Creating Craft console command..."

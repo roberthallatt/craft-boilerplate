@@ -33,8 +33,8 @@ web_environment:
 nginx_config_overrides:
 - .ddev/nginx/nginx-site.conf
 
-# Hooks
+# Hooks - only run if files exist to avoid setup failures
 hooks:
   post-start:
-  - exec: composer install
-  - exec: npm install
+  - exec: "[ -f composer.json ] && composer install --no-interaction || echo 'Skipping composer install - no composer.json found'"
+  - exec: "[ -f package.json ] && npm install || echo 'Skipping npm install - no package.json found'"
