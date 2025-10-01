@@ -3,12 +3,12 @@
 use craft\helpers\App;
 
 return [
-    'devServerPublic' => 'https://localhost:3030',
+    'devServerPublic' => 'VITE_DEV_SERVER_PUBLIC_PLACEHOLDER',
     'serverPublic' => '/',
     'useDevServer' => in_array(App::env('CRAFT_DEV_MODE'), [true, 'true', '1', 1], true),
     'manifestPath' => '@webroot/.vite/manifest.json',
-    'devServerInternal' => 'https://localhost:3030',
-    'checkDevServer' => false,
+    'devServerInternal' => 'VITE_DEV_SERVER_INTERNAL_PLACEHOLDER',
+    'checkDevServer' => true,
     'errorEntry' => '',
     'includeReactRefreshShim' => false,
     'includeModulePreloadShim' => true,

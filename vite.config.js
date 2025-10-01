@@ -20,18 +20,18 @@ export default defineConfig(({ command, mode }) => {
       port: 3030,
       strictPort: true,
       open: false,
-      // Enable HTTPS with mkcert certificates if available
-      https: fs.existsSync('.ddev/certs/localhost.pem') ? {
+      // Auto-detect HTTPS certificates
+      https: fs.existsSync('.ddev/certs/localhost.pem') && fs.existsSync('.ddev/certs/localhost-key.pem') ? {
         key: fs.readFileSync('.ddev/certs/localhost-key.pem'),
         cert: fs.readFileSync('.ddev/certs/localhost.pem'),
-      } : true, // Fallback to basic SSL
+      } : false,
       // Allow all origins
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
-      // HMR configuration
+      // HMR configuration - auto-detect protocol based on HTTPS
       hmr: {
-        protocol: 'wss',
+        protocol: fs.existsSync('.ddev/certs/localhost.pem') ? 'wss' : 'ws',
         host: 'localhost',
         port: 3030,
         clientPort: 3030,

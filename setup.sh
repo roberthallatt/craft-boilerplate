@@ -176,6 +176,32 @@ if command -v mkcert &> /dev/null; then
     mkdir -p .ddev/certs
     mkcert -key-file .ddev/certs/localhost-key.pem -cert-file .ddev/certs/localhost.pem localhost 127.0.0.1 ::1
     print_success "SSL certificates created for localhost"
+    
+    # Configure Vite to use HTTPS with mkcert certificates
+    print_status "Configuring Vite for HTTPS development..."
+    VITE_DEV_SERVER_PUBLIC="https://localhost:3030"
+    VITE_DEV_SERVER_INTERNAL="https://localhost:3030"
+    VITE_HTTPS_ENABLED="true"
+else
+    print_warning "mkcert not found - configuring Vite for HTTP development"
+    print_warning "For better security, install mkcert and re-run setup"
+    
+    # Configure Vite to use HTTP without certificates
+    VITE_DEV_SERVER_PUBLIC="http://localhost:3030"
+    VITE_DEV_SERVER_INTERNAL="http://localhost:3030"
+    VITE_HTTPS_ENABLED="false"
+fi
+
+# Update Craft Vite configuration
+print_status "Updating Craft Vite configuration..."
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i '' "s|VITE_DEV_SERVER_PUBLIC_PLACEHOLDER|$VITE_DEV_SERVER_PUBLIC|" config/vite.php
+    sed -i '' "s|VITE_DEV_SERVER_INTERNAL_PLACEHOLDER|$VITE_DEV_SERVER_INTERNAL|" config/vite.php
+else
+    # Linux
+    sed -i "s|VITE_DEV_SERVER_PUBLIC_PLACEHOLDER|$VITE_DEV_SERVER_PUBLIC|" config/vite.php
+    sed -i "s|VITE_DEV_SERVER_INTERNAL_PLACEHOLDER|$VITE_DEV_SERVER_INTERNAL|" config/vite.php
 fi
 
 # Update DDEV configuration with custom project name
