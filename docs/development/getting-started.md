@@ -38,8 +38,12 @@ This command runs both Vite (for asset building) and Browser-sync (for live relo
 ### 4. Access Your Site
 - **Frontend**: https://craftcms-boilerplate.ddev.site or https://localhost
 - **Admin Panel**: https://craftcms-boilerplate.ddev.site/admin or https://localhost/admin
-  - Username: `admin`
-  - Password: `password`
+
+#### 🔑 Default Admin Credentials
+- **Username**: `admin`
+- **Password**: `password`
+
+> **⚠️ Security Note**: These are default development credentials. Change them immediately in production environments!
 
 > **SSL Note**: DDEV automatically provides SSL certificates. If you get browser warnings, click "Advanced" → "Proceed to site" to accept the self-signed certificate.
 

@@ -69,7 +69,33 @@ npm run dev
 # 5. Access your site
 # Frontend: https://craftcms-boilerplate.ddev.site
 # Admin: https://craftcms-boilerplate.ddev.site/admin
+#   Username: admin
+#   Password: password
 ```
+
+## 🔑 Default Admin Access
+
+The setup script creates a default admin user for development:
+
+- **Admin URL**: `https://your-project.ddev.site/admin`
+- **Username**: `admin`
+- **Password**: `password`
+- **Email**: `admin@example.com`
+
+### Changing Admin Credentials
+
+```bash
+# Change admin password
+ddev craft users/set-password admin
+
+# Create a new admin user
+ddev craft users/create --admin
+
+# List all users
+ddev craft users
+```
+
+> **⚠️ Important**: Always change default credentials before deploying to production!
 
 ## 🔧 Useful DDEV Configurations
 

@@ -1,160 +1,123 @@
 {% extends "_layouts/_layout.twig" %}
 
 {% set title = "Welcome" %}
-{% set metaDescription = "Welcome to our Craft CMS boilerplate with Vite, TailwindCSS, and Alpine.js" %}
+{% set metaDescription = "Welcome to your new Craft CMS site" %}
 
 {% block content %}
   {# Hero Section #}
   <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
     <div class="container-custom py-20">
-      <div class="max-w-3xl mx-auto text-center">
+      <div class="max-w-4xl mx-auto text-center">
         <h1 class="text-4xl md:text-6xl font-bold mb-6">
-          Welcome to Craft CMS
+          🎉 Your Craft CMS Site is Ready!
         </h1>
         <p class="text-xl md:text-2xl mb-8 text-blue-100">
-          A modern boilerplate with Vite, TailwindCSS, and Alpine.js
+          This is a placeholder homepage. Start building your amazing website here.
         </p>
-        <div class="space-x-4">
-          <a href="/about" class="btn btn-primary bg-white text-blue-600 hover:bg-gray-100">
-            Learn More
-          </a>
-          <a href="/contact" class="btn border-2 border-white text-white hover:bg-white hover:text-blue-600">
-            Get Started
-          </a>
+        <div class="bg-blue-700 bg-opacity-50 rounded-lg p-6 max-w-2xl mx-auto">
+          <p class="text-lg text-blue-100 mb-4">
+            <strong>Next steps:</strong> Visit the <a href="/admin" class="underline hover:text-white">admin panel</a> to create content, or edit this template at <code class="bg-blue-800 px-2 py-1 rounded">templates/index.twig</code>
+          </p>
+          <div class="bg-blue-800 bg-opacity-50 rounded-lg p-4 border border-blue-600">
+            <p class="text-sm text-blue-200 mb-2"><strong>🔑 Default Admin Credentials:</strong></p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+              <div>
+                <span class="text-blue-300">Username:</span> 
+                <code class="bg-blue-900 px-2 py-1 rounded text-white">admin</code>
+              </div>
+              <div>
+                <span class="text-blue-300">Password:</span> 
+                <code class="bg-blue-900 px-2 py-1 rounded text-white">password</code>
+              </div>
+            </div>
+            <p class="text-xs text-blue-300 mt-2">⚠️ Change these credentials in production!</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  {# Features Section #}
-  <section class="py-16">
-    <div class="container-custom">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          Modern Development Stack
-        </h2>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-          Everything you need to build fast, modern websites with Craft CMS
-        </p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {# Vite Feature #}
-        <div class="card text-center" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
-          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4" 
-               :class="{ 'bg-blue-200': hover }">
-            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-3">Vite Build System</h3>
-          <p class="text-gray-600">
-            Lightning-fast development with hot module replacement and optimized production builds.
-          </p>
-        </div>
-
-        {# TailwindCSS Feature #}
-        <div class="card text-center" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
-               :class="{ 'bg-green-200': hover }">
-            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-3">TailwindCSS</h3>
-          <p class="text-gray-600">
-            Utility-first CSS framework for rapid UI development with consistent design.
-          </p>
-        </div>
-
-        {# Alpine.js Feature #}
-        <div class="card text-center" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
-          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"
-               :class="{ 'bg-purple-200': hover }">
-            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1a3 3 0 000-6h-1m0 6V4m0 6h6m-7 0a3 3 0 105.196 5.196m0 0A3 3 0 1010 16.172m1.828-2.344L10 16.172"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-3">Alpine.js</h3>
-          <p class="text-gray-600">
-            Lightweight JavaScript framework for adding interactivity without the complexity.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {# Demo Section #}
+  {# Tech Stack Info #}
   <section class="py-16 bg-gray-50">
     <div class="container-custom">
       <div class="max-w-4xl mx-auto">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Interactive Demo
+            What's Included
           </h2>
           <p class="text-xl text-gray-600">
-            See Alpine.js and TailwindCSS in action
+            Your development environment is ready with modern tools
           </p>
         </div>
         
-        {# Counter Demo #}
-        <div class="card max-w-md mx-auto" x-data="{ count: 0 }">
-          <div class="text-center">
-            <h3 class="text-2xl font-semibold mb-4">Counter Demo</h3>
-            <div class="text-6xl font-bold text-blue-600 mb-6" x-text="count"></div>
-            <div class="space-x-4">
-              <button @click="count--" class="btn btn-secondary">
-                Decrease
-              </button>
-              <button @click="count = 0" class="btn btn-secondary">
-                Reset
-              </button>
-              <button @click="count++" class="btn btn-primary">
-                Increase
-              </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="card text-center">
+            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">⚡</span>
             </div>
+            <h3 class="font-semibold mb-2">Craft CMS 5</h3>
+            <p class="text-sm text-gray-600">Modern content management</p>
           </div>
-        </div>
-        
-        {# Toast Demo #}
-        <div class="card max-w-md mx-auto mt-8">
-          <div class="text-center">
-            <h3 class="text-2xl font-semibold mb-4">Toast Demo</h3>
-            <p class="text-gray-600 mb-6">Click a button to show a toast notification</p>
-            <div class="space-x-4">
-              <button onclick="utils.toast('Success message!', 'success')" class="btn bg-green-600 text-white hover:bg-green-700">
-                Success
-              </button>
-              <button onclick="utils.toast('Error message!', 'error')" class="btn bg-red-600 text-white hover:bg-red-700">
-                Error
-              </button>
-              <button onclick="utils.toast('Info message!', 'info')" class="btn btn-primary">
-                Info
-              </button>
+          
+          <div class="card text-center">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">🔥</span>
             </div>
+            <h3 class="font-semibold mb-2">Vite</h3>
+            <p class="text-sm text-gray-600">Lightning-fast builds</p>
+          </div>
+          
+          <div class="card text-center">
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">🎨</span>
+            </div>
+            <h3 class="font-semibold mb-2">TailwindCSS</h3>
+            <p class="text-sm text-gray-600">Utility-first styling</p>
+          </div>
+          
+          <div class="card text-center">
+            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">⚡</span>
+            </div>
+            <h3 class="font-semibold mb-2">Alpine.js</h3>
+            <p class="text-sm text-gray-600">Lightweight interactivity</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  {# CTA Section #}
+  {# Quick Demo #}
   <section class="py-16">
     <div class="container-custom">
-      <div class="bg-blue-600 rounded-2xl p-8 md:p-12 text-center text-white">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">
-          Ready to Get Started?
-        </h2>
-        <p class="text-xl mb-8 text-blue-100">
-          This boilerplate includes everything you need for modern web development
-        </p>
-        <div class="space-x-4">
-          <a href="https://github.com" class="btn bg-white text-blue-600 hover:bg-gray-100">
-            View on GitHub
-          </a>
-          <a href="/contact" class="btn border-2 border-white text-white hover:bg-white hover:text-blue-600">
-            Get Support
-          </a>
+      <div class="max-w-2xl mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            Everything Works!
+          </h2>
+          <p class="text-gray-600">
+            Here's a simple demo to show Alpine.js and TailwindCSS are working
+          </p>
+        </div>
+        
+        {# Simple counter demo #}
+        <div class="card text-center" x-data="{ count: 0 }">
+          <h3 class="text-xl font-semibold mb-4">Interactive Counter</h3>
+          <div class="text-4xl font-bold text-blue-600 mb-6" x-text="count"></div>
+          <div class="flex justify-center space-x-4">
+            <button @click="count--" class="btn btn-secondary">
+              - Decrease
+            </button>
+            <button @click="count = 0" class="btn btn-secondary">
+              Reset
+            </button>
+            <button @click="count++" class="btn btn-primary">
+              Increase +
+            </button>
+          </div>
+          <p class="text-sm text-gray-500 mt-4">
+            This counter is powered by Alpine.js and styled with TailwindCSS
+          </p>
         </div>
       </div>
     </div>

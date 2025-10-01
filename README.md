@@ -43,7 +43,10 @@ Comprehensive guides are available in the [`/docs`](docs/) directory:
 ### 📖 Quick Reference
 - **Requirements:** [DDEV](https://ddev.readthedocs.io/en/stable/#installation) + [Node.js](https://nodejs.org/) (v18+)
 - **Commands:** `ddev start` → `npm run dev` → start coding!
-- **Admin:** `/admin` (admin/password)
+- **Admin Panel:** `/admin`
+  - Username: `admin`
+  - Password: `password`
+  - ⚠️ Change in production!
 
 ## 📁 Project Structure
 
