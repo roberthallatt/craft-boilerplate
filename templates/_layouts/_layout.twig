@@ -23,24 +23,8 @@
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-  {# Debug: Check if dev server is detected #}
-  <!-- DEBUG: Dev mode: {{ craft.app.config.general.devMode ? 'YES' : 'NO' }} -->
-  <!-- DEBUG: Vite dev server: {{ craft.vite.devServerRunning() ? 'YES' : 'NO' }} -->
-  
-  {# Load assets - Force dev server if dev mode is on #}
-  {% if craft.app.config.general.devMode and craft.vite.devServerRunning() %}
-    {# Development mode - load from Vite dev server #}
-    {{ craft.vite.script('src/js/app.js') }}
-  {% elseif craft.app.config.general.devMode %}
-    {# Fallback: Direct dev server loading if Craft plugin fails #}
-    {# Auto-detect protocol based on current page protocol #}
-    {% set viteProtocol = craft.app.request.isSecureConnection ? 'https' : 'http' %}
-    <script type="module" src="{{ viteProtocol }}://localhost:3030/@vite/client"></script>
-    <script type="module" src="{{ viteProtocol }}://localhost:3030/src/js/app.js"></script>
-  {% else %}
-    {# Production mode #}
-    {{ craft.vite.script('src/js/app.js') }}
-  {% endif %}
+  {# Load assets using Craft Vite plugin #}
+  {{ craft.vite.script('src/js/app.js') }}
 
   {# Critical CSS to prevent FOUC - inline in head #}
   <style>
