@@ -20,18 +20,15 @@ export default defineConfig(({ command, mode }) => {
       port: 3000,
       strictPort: true,
       open: false,
-      // Auto-detect HTTPS certificates
-      https: fs.existsSync('.ddev/certs/localhost.pem') && fs.existsSync('.ddev/certs/localhost-key.pem') ? {
-        key: fs.readFileSync('.ddev/certs/localhost-key.pem'),
-        cert: fs.readFileSync('.ddev/certs/localhost.pem'),
-      } : false,
+      // Disable HTTPS for now to avoid certificate issues
+      https: false,
       // Allow all origins
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
-      // HMR configuration - auto-detect protocol based on HTTPS
+      // HMR configuration - use WebSocket for HTTP
       hmr: {
-        protocol: fs.existsSync('.ddev/certs/localhost.pem') ? 'wss' : 'ws',
+        protocol: 'ws',
         host: 'localhost',
         port: 3000,
         clientPort: 3000,
@@ -52,7 +49,7 @@ export default defineConfig(({ command, mode }) => {
     build: {
       outDir: 'web',
       emptyOutDir: false,
-      manifest: true,
+      manifest: '.vite/manifest.json',
       rollupOptions: {
         input: {
           app: resolve(__dirname, 'src/js/app.js')

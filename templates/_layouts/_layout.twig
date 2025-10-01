@@ -27,9 +27,17 @@
   <!-- DEBUG: Dev Mode: {{ craft.app.config.general.devMode ? 'YES' : 'NO' }} -->
   <!-- DEBUG: Vite Dev Server Running: {{ craft.vite.devServerRunning() ? 'YES' : 'NO' }} -->
   <!-- DEBUG: Environment: {{ craft.app.config.env }} -->
+  <!-- DEBUG: CRAFT_DEV_MODE env: {{ craft.app.env('CRAFT_DEV_MODE') }} -->
   
-  {# Load assets using Craft Vite plugin #}
-  {{ craft.vite.script('src/js/app.js') }}
+  {# Load assets - force direct loading in development #}
+  {% if craft.app.config.general.devMode %}
+    <!-- DEBUG: Loading assets directly from Vite dev server -->
+    <script type="module" src="http://localhost:3000/@vite/client"></script>
+    <script type="module" src="http://localhost:3000/src/js/app.js"></script>
+  {% else %}
+    <!-- DEBUG: Loading assets via Craft Vite plugin -->
+    {{ craft.vite.script('src/js/app.js') }}
+  {% endif %}
 
   {# Critical CSS to prevent FOUC - inline in head #}
   <style>
