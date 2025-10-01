@@ -23,11 +23,38 @@
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-  {# Load CSS - Blocking to prevent FOUC #}
-  {{ craft.vite.style('src/css/app.scss') }}
+  {# Load assets using Craft Vite plugin - handles dev vs production automatically #}
+  {% if craft.app.config.general.devMode %}
+    {# Development mode - separate CSS and JS for better hot module replacement #}
+    {{ craft.vite.script('src/js/app.js', false) }}
+    {{ craft.vite.script('src/js/app.js') }}
+  {% else %}
+    {# Production mode - single call loads both CSS and JS efficiently #}
+    {{ craft.vite.script('src/js/app.js') }}
+  {% endif %}
 
-  {# Load JS asynchronously to not block CSS #}
-  {{ craft.vite.script('src/js/app.js', true) }}
+  {# Critical CSS to prevent FOUC - inline in head #}
+  <style>
+    /* Critical path CSS inserted during server-side rendering */
+    html.loading body {
+      opacity: 0;
+    }
+    body {
+      background-color: #f3f4f6; /* bg-gray-100 equivalent */
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out;
+    }
+  </style>
+  
+  {# Add loading class and remove it when DOM is ready #}
+  <script>
+    document.documentElement.classList.add('loading');
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
+        document.documentElement.classList.remove('loading');
+      }, 50);
+    });
+  </script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   
 </head>

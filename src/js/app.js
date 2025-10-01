@@ -1,4 +1,4 @@
-// Import CSS
+// Import CSS for Vite to handle
 import '../css/app.scss';
 
 // Alpine.js will be loaded via CDN in the template

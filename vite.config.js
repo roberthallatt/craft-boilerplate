@@ -1,73 +1,104 @@
-import { defineConfig } from 'vite'
-import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
+import fs from 'fs';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 import ViteRestart from 'vite-plugin-restart';
-import fs from 'node:fs';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig(({ command, mode }) => {
   const isDev = command === 'serve' || mode === 'development' || process.env.NODE_ENV === 'development';
-
   const hasCKEditorCss = fs.existsSync('src/css/ckeditor-content.css');
 
   return {
-    // In dev mode, we serve assets at the root of localhost:3000
-    // In production, files live in the /dist directory
-    base: '/dist/',
+    // Root directory - point to project root, not web folder
+    root: '.',
+    
+    // Server configuration
+    server: {
+      port: 3030,
+      strictPort: true,
+      open: false,
+      // Enable HTTPS with mkcert certificates if available
+      https: fs.existsSync('.ddev/certs/localhost.pem') ? {
+        key: fs.readFileSync('.ddev/certs/localhost-key.pem'),
+        cert: fs.readFileSync('.ddev/certs/localhost.pem'),
+      } : true, // Fallback to basic SSL
+      // Allow all origins
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+      // HMR configuration
+      hmr: {
+        protocol: 'wss',
+        host: 'localhost',
+        port: 3030,
+        clientPort: 3030,
+        timeout: 120000,
+        overlay: false
+      },
+      // Proxy all requests not handled by Vite to the CMS
+      proxy: {
+        '^(?!/(@vite|src|node_modules))': {
+          target: 'https://localhost',
+          changeOrigin: true,
+          secure: false
+        }
+      }
+    },
+
+    // Build configuration
     build: {
+      outDir: 'web',
+      emptyOutDir: false,
       manifest: true,
-      // Where your production files end up
-      outDir: './web/dist/',
-      // Enable CSS code splitting to break the dependency chain
-      cssCodeSplit: true,
-      // Optimize chunks for better loading
-      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         input: {
-          app: 'src/js/app.js',
-          'app-styles': 'src/css/app.scss', // Separate CSS entry with app prefix
+          app: resolve(__dirname, 'src/js/app.js')
         },
         output: {
-          entryFileNames: 'assets/js/[name].[hash].js',
-          chunkFileNames: 'assets/js/[name].[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
           assetFileNames: (assetInfo) => {
-            if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-              return 'assets/css/[name].[hash][extname]';
+            if (/\.(css)$/i.test(assetInfo.name)) {
+              return `assets/css/[name]-[hash][extname]`
             }
-            if (assetInfo.name && (assetInfo.name.endsWith('.png') || assetInfo.name.endsWith('.jpg') || assetInfo.name.endsWith('.jpeg') || assetInfo.name.endsWith('.svg') || assetInfo.name.endsWith('.avif') || assetInfo.name.endsWith('.webp'))) {
-              return 'assets/img/[name].[hash][extname]';
+            if (/\.(png|jpe?g|gif|svg|webp|ico)$/i.test(assetInfo.name)) {
+              return `assets/img/[name]-[hash][extname]`
             }
-            return 'assets/[name].[hash][extname]';
+            if (/\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name)) {
+              return `assets/fonts/[name]-[hash][extname]`
+            }
+            return `assets/[name]-[hash][extname]`
           },
-          // Ensure CSS is extracted separately
-          manualChunks: undefined,
+          chunkFileNames: 'assets/js/[name]-[hash].js',
         },
       },
-      // Enable minification
-      minify: 'terser',
-      terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-        },
-      },
+      assetsInclude: ['**/*.woff2', '**/*.woff', '**/*.ttf', '**/*.eot', '**/*.otf']
     },
+
+    // Public directory handling
+    publicDir: 'web/public',
+    
     css: {
       postcss: {
         plugins: [
           tailwindcss(),
           autoprefixer(),
         ]
-      }
+      },
+      devSourcemap: true
     },
+    
     plugins: [
-      // Watch Twig templates for TailwindCSS regeneration and browser reload
+      // Watch config files and templates for CSS regeneration
       ViteRestart({
         restart: [
-          'templates/**/*.twig',
+          'tailwind.config.js',
+          'vite.config.js'
         ],
         reload: [
-          'templates/**/*.twig',
+          'templates/**/*.twig'
         ]
       }),
       viteStaticCopy({
@@ -79,21 +110,13 @@ export default defineConfig(({ command, mode }) => {
             hasCKEditorCss
               ? [{ src: 'src/css/ckeditor-content.css', dest: 'assets/css', rename: 'ckeditor-content.css' }]
               : []
-          )
+          ),
         ],
         watch: {
           reloadPageOnChange: true
         }
       }),
-      // Note: Image optimization removed due to compatibility issues with ARM64
-      // You can add vite-plugin-imagemin back if needed for your specific environment
-    ],
-    server: {
-      host: '0.0.0.0', // Allow external connections
-      port: 3000,
-      strictPort: true,
-      cors: true,
-      origin: 'http://localhost:3000'
-    }
+      basicSsl()
+    ]
   }
 })
