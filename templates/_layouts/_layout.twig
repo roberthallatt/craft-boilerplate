@@ -23,6 +23,11 @@
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
+  {# Debug Vite configuration #}
+  <!-- DEBUG: Dev Mode: {{ craft.app.config.general.devMode ? 'YES' : 'NO' }} -->
+  <!-- DEBUG: Vite Dev Server Running: {{ craft.vite.devServerRunning() ? 'YES' : 'NO' }} -->
+  <!-- DEBUG: Environment: {{ craft.app.config.env }} -->
+  
   {# Load assets using Craft Vite plugin #}
   {{ craft.vite.script('src/js/app.js') }}
 
