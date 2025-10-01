@@ -2,6 +2,33 @@
 
 This guide covers the day-to-day development workflow with this Craft CMS boilerplate.
 
+## 🔒 SSL Certificate Setup
+
+DDEV automatically provides SSL certificates for local development:
+
+### Default SSL Access
+- `https://craftcms-boilerplate.ddev.site` ✅ (Always works)
+- `https://localhost` ✅ (Configured as additional hostname)
+
+### Accepting Self-Signed Certificates
+When first accessing the site, your browser may show a security warning:
+1. Click **"Advanced"** or **"Show Details"**
+2. Click **"Proceed to site"** or **"Accept Risk"**
+3. The certificate will be remembered for future visits
+
+### Alternative: Install DDEV's CA Certificate
+For a seamless experience without browser warnings:
+
+```bash
+# Install DDEV's Certificate Authority
+mkcert -install
+
+# Restart DDEV to regenerate certificates
+ddev restart
+```
+
+This makes browsers trust all DDEV SSL certificates automatically.
+
 ## 🚀 Daily Workflow
 
 ### Starting Development
@@ -158,9 +185,17 @@ ddev craft project-config/rebuild
 - **ESLint** (optional) for JavaScript linting
 
 ### Browser Testing
-- **Browser-sync** provides live reloading
-- Test across different devices using the external URL
+- **Browser-sync** provides live reloading at `https://localhost:3001`
+- Automatically uses DDEV's SSL certificates when available
+- Test across different devices using the external URL from `ddev describe`
 - Use browser dev tools for responsive testing
+
+### Browser-sync SSL Integration
+Browser-sync is configured to:
+- Proxy your DDEV site (`https://craftcms-boilerplate.ddev.site`)
+- Use DDEV's SSL certificates if available
+- Fall back to self-signed certificates if needed
+- Handle certificate validation automatically
 
 ## 🔧 Customization
 

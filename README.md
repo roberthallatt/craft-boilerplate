@@ -23,8 +23,8 @@ cd my-craft-project
 npm run dev
 
 # 3. Visit your site
-# Frontend: https://craftcms-boilerplate.ddev.site
-# Admin: https://craftcms-boilerplate.ddev.site/admin (admin/password)
+# Frontend: https://craftcms-boilerplate.ddev.site or https://localhost
+# Admin: https://localhost/admin (admin/password)
 ```
 
 ## 📚 Documentation

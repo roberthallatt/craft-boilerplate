@@ -182,6 +182,59 @@ ddev composer remove vendor/plugin-name
 ddev composer require vendor/plugin-name
 ```
 
+## 🔒 SSL Certificate Issues
+
+### Browser Security Warnings
+**Symptoms:** "Your connection is not private" or "Certificate not trusted"
+
+**Solutions:**
+```bash
+# Option 1: Accept the certificate manually
+# Click "Advanced" → "Proceed to site" in browser
+
+# Option 2: Install DDEV's Certificate Authority
+mkcert -install
+ddev restart
+
+# Option 3: Use HTTP for development (not recommended)
+# Change PRIMARY_SITE_URL in .env to http://
+```
+
+### SSL Certificate Not Working for localhost
+**Symptoms:** `https://localhost` shows certificate errors
+
+**Solutions:**
+```bash
+# Ensure localhost is configured as additional hostname
+# Check .ddev/config.yaml contains:
+# additional_hostnames:
+# - localhost
+
+# Restart DDEV to regenerate certificates
+ddev restart
+
+# Clear browser SSL cache
+# Chrome: Settings → Privacy → Clear browsing data → Cached images and files
+```
+
+### mkcert Installation Issues
+**Symptoms:** `mkcert` command not found
+
+**Solutions:**
+```bash
+# Install mkcert on macOS
+brew install mkcert
+
+# Install mkcert on Linux
+sudo apt install libnss3-tools
+wget -O mkcert https://github.com/FiloSottile/mkcert/releases/latest/download/mkcert-v*-linux-amd64
+chmod +x mkcert
+sudo mv mkcert /usr/local/bin/
+
+# Install mkcert on Windows
+choco install mkcert
+```
+
 ## 🌐 Browser Issues
 
 ### Live Reload Not Working
@@ -190,13 +243,44 @@ ddev composer require vendor/plugin-name
 **Solutions:**
 ```bash
 # Check if browser-sync is running
-# Should see "Local: http://localhost:3001"
+# Should see "Local: https://localhost:3001"
 
 # Restart development
 npm run dev
 
 # Clear browser cache
 # Hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
+```
+
+### Browser-sync SSL Issues
+**Symptoms:** Browser-sync fails to start or shows certificate errors
+
+**Solutions:**
+```bash
+# Check if DDEV is running
+ddev describe
+
+# Restart DDEV to regenerate certificates
+ddev restart
+
+# Check Browser-sync configuration
+# bs-config.cjs should automatically detect DDEV certificates
+
+# If still failing, check the Browser-sync output for specific errors
+npm run dev:sync
+```
+
+### Browser-sync Port Conflicts
+**Symptoms:** "Port 3001 is already in use"
+
+**Solutions:**
+```bash
+# Kill processes using the port
+lsof -ti:3001 | xargs kill -9
+lsof -ti:3002 | xargs kill -9
+
+# Or change ports in bs-config.cjs
+# Edit port: 3001 to a different port
 ```
 
 ### HTTPS Certificate Issues

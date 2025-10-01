@@ -57,6 +57,71 @@ fi
 
 print_success "All required tools are available"
 
+# Check for mkcert and offer to install it
+print_status "Checking for mkcert (for trusted SSL certificates)..."
+
+if ! command -v mkcert &> /dev/null; then
+    print_warning "mkcert is not installed. This tool creates trusted SSL certificates for local development."
+    echo ""
+    echo "Without mkcert, you'll see browser security warnings when accessing https://localhost"
+    echo "You can still proceed and accept the warnings manually."
+    echo ""
+    
+    # Detect OS and offer installation
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        if command -v brew &> /dev/null; then
+            echo "Would you like to install mkcert via Homebrew? (y/n)"
+            read -r response
+            if [[ "$response" =~ ^[Yy]$ ]]; then
+                print_status "Installing mkcert via Homebrew..."
+                brew install mkcert
+                print_success "mkcert installed successfully"
+            else
+                print_warning "Skipping mkcert installation. You can install it later with: brew install mkcert"
+            fi
+        else
+            print_warning "Homebrew not found. You can install mkcert manually:"
+            echo "1. Install Homebrew: https://brew.sh/"
+            echo "2. Run: brew install mkcert"
+        fi
+    elif [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "win32" ]]; then
+        # Windows
+        if command -v choco &> /dev/null; then
+            echo "Would you like to install mkcert via Chocolatey? (y/n)"
+            read -r response
+            if [[ "$response" =~ ^[Yy]$ ]]; then
+                print_status "Installing mkcert via Chocolatey..."
+                choco install mkcert -y
+                print_success "mkcert installed successfully"
+            else
+                print_warning "Skipping mkcert installation. You can install it later with: choco install mkcert"
+            fi
+        else
+            print_warning "Chocolatey not found. You can install mkcert manually:"
+            echo "1. Install Chocolatey: https://chocolatey.org/install"
+            echo "2. Run: choco install mkcert"
+            echo "Or download from: https://github.com/FiloSottile/mkcert/releases"
+        fi
+    else
+        # Linux
+        print_warning "On Linux, you can install mkcert with:"
+        echo "sudo apt install libnss3-tools"
+        echo "wget -O mkcert https://github.com/FiloSottile/mkcert/releases/latest/download/mkcert-v*-linux-amd64"
+        echo "chmod +x mkcert && sudo mv mkcert /usr/local/bin/"
+    fi
+    echo ""
+else
+    print_success "mkcert is already installed"
+fi
+
+# If mkcert is available, set up the certificate authority
+if command -v mkcert &> /dev/null; then
+    print_status "Setting up mkcert certificate authority..."
+    mkcert -install
+    print_success "Certificate authority installed - SSL certificates will be trusted by browsers"
+fi
+
 # Create .env file if it doesn't exist
 if [ ! -f ".env" ]; then
     print_status "Creating .env file from .env.example..."
@@ -169,10 +234,13 @@ echo "🎉 Your Craft CMS boilerplate is ready!"
 echo "======================================"
 echo ""
 echo "📋 Next steps:"
-echo "1. Visit your site: https://craftcms-boilerplate.ddev.site"
-echo "2. Admin panel: https://craftcms-boilerplate.ddev.site/admin"
-echo "   - Username: admin"
-echo "   - Password: password"
+echo "1. Visit your site:"
+echo "   • https://craftcms-boilerplate.ddev.site"
+echo "   • https://localhost (alternative URL)"
+echo "2. Admin panel:"
+echo "   • https://localhost/admin"
+echo "   • Username: admin"
+echo "   • Password: password"
 echo ""
 echo "🛠️  Development commands:"
 echo "• npm run dev          - Start development with hot reload"
@@ -186,4 +254,15 @@ echo "• src/css/app.scss     - Main stylesheet"
 echo "• src/js/app.js        - Main JavaScript file"
 echo "• config/              - Craft CMS configuration"
 echo ""
+
+# Add SSL certificate note based on mkcert availability
+if command -v mkcert &> /dev/null; then
+    echo "🔒 SSL certificates are trusted by your browser (mkcert installed)"
+else
+    echo "🔒 SSL Note: You may see browser warnings for https://localhost"
+    echo "   Click 'Advanced' → 'Proceed to site' to accept the certificate"
+    echo "   Or install mkcert later: brew install mkcert && mkcert -install && ddev restart"
+fi
+echo ""
+
 print_success "Happy coding! 🚀"

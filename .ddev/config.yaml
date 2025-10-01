@@ -6,7 +6,8 @@ webserver_type: nginx-fpm
 xdebug_enabled: false
 performance_mode: none
 disable_upload_dirs_warning: true
-additional_hostnames: []
+additional_hostnames: 
+- localhost
 additional_fqdns: []
 database:
   type: mysql

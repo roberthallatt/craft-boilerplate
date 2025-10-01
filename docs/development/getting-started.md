@@ -26,6 +26,7 @@ This script will:
 - Install PHP dependencies via Composer
 - Install Node.js dependencies
 - Set up initial Craft CMS configuration
+- Check for mkcert and offer to install it (for trusted SSL certificates)
 
 ### 3. Start Development
 ```bash
@@ -35,10 +36,12 @@ npm run dev
 This command runs both Vite (for asset building) and Browser-sync (for live reloading).
 
 ### 4. Access Your Site
-- **Frontend**: https://craftcms-boilerplate.ddev.site
-- **Admin Panel**: https://craftcms-boilerplate.ddev.site/admin
+- **Frontend**: https://craftcms-boilerplate.ddev.site or https://localhost
+- **Admin Panel**: https://craftcms-boilerplate.ddev.site/admin or https://localhost/admin
   - Username: `admin`
   - Password: `password`
+
+> **SSL Note**: DDEV automatically provides SSL certificates. If you get browser warnings, click "Advanced" → "Proceed to site" to accept the self-signed certificate.
 
 ## 📁 Project Structure
 
