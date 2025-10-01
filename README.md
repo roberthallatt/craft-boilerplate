@@ -11,50 +11,48 @@ A modern Craft CMS boilerplate with Vite, TailwindCSS, and Alpine.js for rapid d
 - **DDEV** - Containerized development environment
 - **Browser-sync** - Live reloading and synchronized browsing
 
-## 📋 Requirements
+## ⚡ Quick Start
 
-- [DDEV](https://ddev.readthedocs.io/en/stable/#installation) (includes PHP and Composer)
-- [Node.js](https://nodejs.org/) (v18+)
+```bash
+# 1. Clone and setup
+git clone <repository-url> my-craft-project
+cd my-craft-project
+./setup.sh
 
-## 🛠️ Quick Start
+# 2. Start development
+npm run dev
 
-1. **Clone or download this boilerplate**
-   ```bash
-   # If cloning from a repository
-   git clone <repository-url> my-craft-project
-   cd my-craft-project
-   ```
+# 3. Visit your site
+# Frontend: https://craftcms-boilerplate.ddev.site
+# Admin: https://craftcms-boilerplate.ddev.site/admin (admin/password)
+```
 
-2. **Run the setup script**
-   ```bash
-   ./setup.sh
-   ```
+## 📚 Documentation
 
-3. **Start development**
-   ```bash
-   npm run dev
-   ```
+Comprehensive guides are available in the [`/docs`](docs/) directory:
 
-4. **Visit your site**
-   - Frontend: https://craftcms-boilerplate.ddev.site
-   - Admin: https://craftcms-boilerplate.ddev.site/admin
-     - Username: `admin`
-     - Password: `password`
+### 🛠️ Development
+- **[Getting Started](docs/development/getting-started.md)** - Initial setup and requirements
+- **[Local Development](docs/development/local-development.md)** - Daily workflow and best practices
+- **[DDEV Commands](docs/development/ddev-commands.md)** - Complete DDEV reference
+- **[Troubleshooting](docs/development/troubleshooting.md)** - Common issues and solutions
+
+### 🚀 Deployment
+- **[Production Deployment](docs/deployment/production.md)** - Deploy to production servers
+
+### 📖 Quick Reference
+- **Requirements:** [DDEV](https://ddev.readthedocs.io/en/stable/#installation) + [Node.js](https://nodejs.org/) (v18+)
+- **Commands:** `ddev start` → `npm run dev` → start coding!
+- **Admin:** `/admin` (admin/password)
 
 ## 📁 Project Structure
 
 ```
 ├── config/              # Craft CMS configuration
-├── src/                 # Source assets
-│   ├── css/            # Stylesheets (SCSS)
-│   ├── js/             # JavaScript files
-│   └── img/            # Images
+├── docs/                # Documentation
+├── src/                 # Source assets (CSS, JS, images)
 ├── templates/           # Twig templates
-│   ├── _layouts/       # Layout templates
-│   └── index.twig      # Homepage template
-├── web/                 # Web root
-│   ├── dist/           # Built assets (auto-generated)
-│   └── index.php       # Entry point
+├── web/                 # Web root (index.php, built assets)
 ├── .ddev/              # DDEV configuration
 ├── package.json        # Node.js dependencies
 ├── composer.json       # PHP dependencies
@@ -63,103 +61,17 @@ A modern Craft CMS boilerplate with Vite, TailwindCSS, and Alpine.js for rapid d
 └── setup.sh           # Setup script
 ```
 
-## 🔧 Development Commands
+## 🎨 Tech Stack
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development with hot reload |
-| `npm run build` | Build for production |
-| `npm run build:watch` | Build and watch for changes |
-| `npm run dev:sync` | Start browser-sync only |
-| `ddev start` | Start DDEV environment |
-| `ddev stop` | Stop DDEV environment |
-| `ddev craft` | Run Craft CLI commands |
+- **Backend:** Craft CMS 5 (PHP 8.2+)
+- **Frontend:** Vite + TailwindCSS + Alpine.js
+- **Development:** DDEV + Browser-sync
+- **Database:** MySQL (via DDEV)
 
-## 🎨 Customization
+## 🔌 Included Plugins
 
-### TailwindCSS
-- Edit `tailwind.config.js` to customize your design system
-- Main stylesheet: `src/css/app.scss`
-
-### Alpine.js
-- Alpine.js is loaded via CDN in the layout template
-- Add custom JavaScript to `src/js/app.js`
-
-### Templates
-- Main layout: `templates/_layouts/_layout.twig`
-- Homepage: `templates/index.twig`
-- Create new templates in the `templates/` directory
-
-### Vite Configuration
-- Edit `vite.config.js` for build customization
-- Assets are automatically optimized for production
-
-## 🔌 Craft CMS Plugins
-
-This boilerplate includes:
-- **Vite Plugin** - Asset management
+- **Vite Plugin** - Modern asset management
 - **SEOmatic** - SEO optimization
-
-To add more plugins:
-```bash
-ddev composer require plugin-vendor/plugin-name
-```
-
-## 🌐 Deployment
-
-1. **Build assets for production**
-   ```bash
-   npm run build
-   ```
-
-2. **Upload files to your server**
-   - Upload all files except `node_modules/`, `.ddev/`, and development files
-   - Set up your production database and update `.env`
-
-3. **Install dependencies on server**
-   ```bash
-   # On server with Composer installed
-   composer install --no-dev --optimize-autoloader
-   
-   # Or during development with DDEV
-   ddev composer install --no-dev --optimize-autoloader
-   ```
-
-## 📝 Environment Variables
-
-Key environment variables in `.env`:
-
-```env
-CRAFT_ENVIRONMENT=development
-CRAFT_SECURITY_KEY=your-security-key
-CRAFT_DB_SERVER=db
-CRAFT_DB_DATABASE=db
-CRAFT_DB_USER=db
-CRAFT_DB_PASSWORD=db
-PRIMARY_SITE_URL=https://craftcms-boilerplate.ddev.site
-```
-
-## 🐛 Troubleshooting
-
-### DDEV Issues
-```bash
-ddev restart
-ddev composer install
-ddev craft clear-caches/all
-```
-
-### Asset Build Issues
-```bash
-rm -rf node_modules/
-npm install
-npm run build
-```
-
-### Permission Issues
-```bash
-chmod -R 755 web/
-chmod -R 755 storage/
-```
 
 ## 📚 Resources
 
