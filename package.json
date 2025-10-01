@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm run dev:clean && vite",
-    "dev:clean": "lsof -ti:3030 | xargs kill -9 2>/dev/null || true",
+    "dev:clean": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true",
     "dev:host": "vite --host",
     "build": "vite build",
     "build:watch": "vite build --watch",

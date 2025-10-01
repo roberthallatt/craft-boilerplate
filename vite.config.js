@@ -17,7 +17,7 @@ export default defineConfig(({ command, mode }) => {
     
     // Server configuration
     server: {
-      port: 3030,
+      port: 3000,
       strictPort: true,
       open: false,
       // Auto-detect HTTPS certificates
@@ -33,8 +33,8 @@ export default defineConfig(({ command, mode }) => {
       hmr: {
         protocol: fs.existsSync('.ddev/certs/localhost.pem') ? 'wss' : 'ws',
         host: 'localhost',
-        port: 3030,
-        clientPort: 3030,
+        port: 3000,
+        clientPort: 3000,
         timeout: 120000,
         overlay: false
       },
@@ -98,7 +98,10 @@ export default defineConfig(({ command, mode }) => {
           'vite.config.js'
         ],
         reload: [
-          'templates/**/*.twig'
+          'templates/**/*.twig',
+          'templates/**/*.html',
+          'src/css/**/*.scss',
+          'src/css/**/*.css'
         ]
       }),
       viteStaticCopy({
