@@ -12,34 +12,28 @@ function templateWatcher() {
   return {
     name: 'template-watcher',
     configureServer(server) {
-      // Watch template directory
-      server.watcher.add(resolve(__dirname, 'templates/**/*.twig'));
+      const templatesPath = resolve(__dirname, 'templates');
 
-      server.watcher.on('change', async (file) => {
-        if (file.endsWith('.twig') || file.endsWith('.html')) {
-          console.log(`🔄 Template changed: ${file}`);
+      server.watcher.add(templatesPath);
 
-          // Invalidate the CSS module so Tailwind rescans
-          const cssModule = server.moduleGraph.getModulesByFile(
+      server.watcher.on('change', (file) => {
+        if (file.includes('/templates/') && file.endsWith('.twig')) {
+          console.log(`Template changed: ${file}`);
+
+          // Find and invalidate all CSS modules
+          const modules = server.moduleGraph.getModulesByFile(
             resolve(__dirname, 'src/css/app.scss')
           );
 
-          if (cssModule && cssModule.size > 0) {
-            cssModule.forEach(mod => {
+          if (modules) {
+            modules.forEach(mod => {
               server.moduleGraph.invalidateModule(mod);
             });
+            console.log('CSS invalidated, Tailwind will rescan templates');
           }
 
-          // Trigger HMR update
-          server.ws.send({
-            type: 'update',
-            updates: Array.from(cssModule || []).map(mod => ({
-              type: 'css-update',
-              path: mod.url,
-              acceptedPath: mod.url,
-              timestamp: Date.now()
-            }))
-          });
+          // Force full reload
+          server.ws.send({ type: 'full-reload', path: '*' });
         }
       });
     }
