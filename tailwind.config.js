@@ -2,7 +2,7 @@
 const plugin = require('tailwindcss/plugin');
 export default {
 	// Watch Twig templates and any JS or JSX that might use Tailwind classes.
-  content: ['./templates/**/*.twig', './src/**/*.{js,jsx,ts,tsx,svg}'],
+  content: ['./templates/**/*.twig', './src/**/*.{js,jsx,ts,tsx,svg,scss,css}'],
   theme: {
     screens: {
       '2xs': { min: '300px' },
