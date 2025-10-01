@@ -2,9 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* TEST: This should make the body have a red border if CSS is loading */
-body {
-  border: 5px solid red !important;
+/* Test class to verify Tailwind is working */
+.test-class {
+  background-color: orange !important;
+  padding: 20px !important;
+  border: 3px solid purple !important;
 }
 
 /* Custom base styles */

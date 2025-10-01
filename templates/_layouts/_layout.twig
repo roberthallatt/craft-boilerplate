@@ -24,16 +24,10 @@
   
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-
-  {# Debug Vite configuration #}
-  <!-- DEBUG: Dev Mode: {{ craft.app.config.general.devMode ? 'YES' : 'NO' }} -->
-  <!-- DEBUG: Vite Dev Server Running: {{ craft.vite.devServerRunning() ? 'YES' : 'NO' }} -->
-  <!-- DEBUG: Environment: {{ craft.app.config.env }} -->
-  <!-- DEBUG: CRAFT_DEV_MODE env: "{{ craft.app.env('CRAFT_DEV_MODE') ?? 'NOT_SET' }}" -->
-  <!-- DEBUG: All env vars: {{ craft.app.config.general.devMode }} -->
-  
-  {# Use Craft Vite plugin - should work now with fixed config #}
-  {{ craft.vite.script('src/js/app.js') }}
+ 
+  {# Force direct loading from Vite dev server - bypass Craft plugin completely #}
+  <script type="module" src="http://localhost:3000/@vite/client"></script>
+  <script type="module" src="http://localhost:3000/src/js/app.js"></script>
 
   {# Critical CSS to prevent FOUC - inline in head #}
   <style>

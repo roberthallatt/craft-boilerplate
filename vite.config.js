@@ -7,6 +7,45 @@ import ViteRestart from 'vite-plugin-restart';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 
+// Custom plugin to watch templates and trigger CSS rebuild
+function templateWatcher() {
+  return {
+    name: 'template-watcher',
+    configureServer(server) {
+      // Watch template directory
+      server.watcher.add(resolve(__dirname, 'templates/**/*.twig'));
+
+      server.watcher.on('change', async (file) => {
+        if (file.endsWith('.twig') || file.endsWith('.html')) {
+          console.log(`🔄 Template changed: ${file}`);
+
+          // Invalidate the CSS module so Tailwind rescans
+          const cssModule = server.moduleGraph.getModulesByFile(
+            resolve(__dirname, 'src/css/app.scss')
+          );
+
+          if (cssModule && cssModule.size > 0) {
+            cssModule.forEach(mod => {
+              server.moduleGraph.invalidateModule(mod);
+            });
+          }
+
+          // Trigger HMR update
+          server.ws.send({
+            type: 'update',
+            updates: Array.from(cssModule || []).map(mod => ({
+              type: 'css-update',
+              path: mod.url,
+              acceptedPath: mod.url,
+              timestamp: Date.now()
+            }))
+          });
+        }
+      });
+    }
+  }
+}
+
 export default defineConfig(({ command, mode }) => {
   const isDev = command === 'serve' || mode === 'development' || process.env.NODE_ENV === 'development';
   const hasCKEditorCss = fs.existsSync('src/css/ckeditor-content.css');
@@ -91,6 +130,9 @@ export default defineConfig(({ command, mode }) => {
     },
     
     plugins: [
+      // Custom plugin to watch templates and trigger CSS rebuild
+      templateWatcher(),
+      
       // Watch config files and templates for CSS regeneration
       ViteRestart({
         restart: [
@@ -99,9 +141,7 @@ export default defineConfig(({ command, mode }) => {
         ],
         reload: [
           'templates/**/*.twig',
-          'templates/**/*.html',
-          'src/css/**/*.scss',
-          'src/css/**/*.css'
+          'templates/**/*.html'
         ]
       }),
       viteStaticCopy({
