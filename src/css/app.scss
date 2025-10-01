@@ -11,6 +11,15 @@
   body {
     @apply bg-gray-100 text-gray-900;
   }
+  
+  /* Prevent flash of unstyled content */
+  .no-js body {
+    visibility: hidden;
+  }
+  
+  body {
+    visibility: visible;
+  }
 }
 
 /* Custom component styles */
