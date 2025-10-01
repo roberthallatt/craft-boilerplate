@@ -38,6 +38,56 @@ if [ ! -f "composer.json" ] || [ ! -f "package.json" ]; then
     exit 1
 fi
 
+# Get project name from user
+echo ""
+print_status "Project Configuration"
+echo "====================="
+echo ""
+echo "What would you like to name your project?"
+echo "This will be used for:"
+echo "• DDEV project name"
+echo "• Domain name (yourname.ddev.site)"
+echo "• SSL certificates"
+echo ""
+echo "Requirements:"
+echo "• Use lowercase letters, numbers, and hyphens only"
+echo "• No spaces or special characters"
+echo "• Example: my-craft-site, blog-project, portfolio-2024"
+echo ""
+
+while true; do
+    read -p "Project name: " PROJECT_NAME
+    
+    # Validate project name
+    if [[ -z "$PROJECT_NAME" ]]; then
+        print_error "Project name cannot be empty"
+        continue
+    fi
+    
+    # Check for valid characters (lowercase letters, numbers, hyphens)
+    if [[ ! "$PROJECT_NAME" =~ ^[a-z0-9-]+$ ]]; then
+        print_error "Project name can only contain lowercase letters, numbers, and hyphens"
+        continue
+    fi
+    
+    # Check length (DDEV has limits)
+    if [[ ${#PROJECT_NAME} -gt 63 ]]; then
+        print_error "Project name must be 63 characters or less"
+        continue
+    fi
+    
+    if [[ ${#PROJECT_NAME} -lt 3 ]]; then
+        print_error "Project name must be at least 3 characters"
+        continue
+    fi
+    
+    break
+done
+
+print_success "Project name set to: $PROJECT_NAME"
+echo "Your site will be available at: https://$PROJECT_NAME.ddev.site"
+echo ""
+
 # Check for required tools
 print_status "Checking for required tools..."
 
@@ -115,12 +165,29 @@ else
     print_success "mkcert is already installed"
 fi
 
-# If mkcert is available, set up the certificate authority
+# If mkcert is available, set up the certificate authority and create certificates
 if command -v mkcert &> /dev/null; then
     print_status "Setting up mkcert certificate authority..."
     mkcert -install
     print_success "Certificate authority installed - SSL certificates will be trusted by browsers"
+    
+    # Create trusted certificates for localhost (for Browser-sync)
+    print_status "Creating trusted SSL certificates for development..."
+    mkdir -p .ddev/certs
+    mkcert -key-file .ddev/certs/localhost-key.pem -cert-file .ddev/certs/localhost.pem localhost 127.0.0.1 ::1
+    print_success "SSL certificates created for localhost"
 fi
+
+# Update DDEV configuration with custom project name
+print_status "Configuring DDEV with project name: $PROJECT_NAME"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i '' "s/name: craftcms-boilerplate/name: $PROJECT_NAME/" .ddev/config.yaml
+else
+    # Linux
+    sed -i "s/name: craftcms-boilerplate/name: $PROJECT_NAME/" .ddev/config.yaml
+fi
+print_success "DDEV configuration updated"
 
 # Create .env file if it doesn't exist
 if [ ! -f ".env" ]; then
@@ -199,8 +266,8 @@ ddev craft install --interactive=0 \
     --username=admin \
     --password=password \
     --email=admin@example.com \
-    --siteName="Craft CMS Boilerplate" \
-    --siteUrl="https://craftcms-boilerplate.ddev.site" \
+    --siteName="$PROJECT_NAME" \
+    --siteUrl="https://$PROJECT_NAME.ddev.site" \
     --language=en-US
 
 # Build assets
@@ -235,10 +302,10 @@ echo "======================================"
 echo ""
 echo "📋 Next steps:"
 echo "1. Visit your site:"
-echo "   • https://craftcms-boilerplate.ddev.site"
-echo "   • https://localhost (alternative URL)"
+echo "   • https://$PROJECT_NAME.ddev.site"
+echo "   • https://localhost:3001 (Browser-sync with live reload)"
 echo "2. Admin panel:"
-echo "   • https://localhost/admin"
+echo "   • https://$PROJECT_NAME.ddev.site/admin"
 echo "   • Username: admin"
 echo "   • Password: password"
 echo ""
@@ -258,10 +325,13 @@ echo ""
 # Add SSL certificate note based on mkcert availability
 if command -v mkcert &> /dev/null; then
     echo "🔒 SSL certificates are trusted by your browser (mkcert installed)"
+    echo "   • https://$PROJECT_NAME.ddev.site - DDEV site (trusted)"
+    echo "   • https://localhost:3001 - Browser-sync (trusted)"
 else
-    echo "🔒 SSL Note: You may see browser warnings for https://localhost"
-    echo "   Click 'Advanced' → 'Proceed to site' to accept the certificate"
-    echo "   Or install mkcert later: brew install mkcert && mkcert -install && ddev restart"
+    echo "🔒 SSL Note: You may see browser warnings for HTTPS URLs"
+    echo "   • https://$PROJECT_NAME.ddev.site - Click 'Advanced' → 'Proceed'"
+    echo "   • https://localhost:3001 - Browser-sync may show warnings"
+    echo "   To fix: brew install mkcert && mkcert -install && ./setup.sh"
 fi
 echo ""
 
