@@ -363,13 +363,20 @@ fi
 
 # Create some sample content
 print_status "Creating sample content..."
-if ddev craft sections/create \
-    --name="Pages" \
-    --handle="pages" \
-    --type="structure" 2>/dev/null; then
-    print_success "Pages section created successfully"
+
+# Check if pages section already exists by trying to get it
+if ddev craft sections/get pages >/dev/null 2>&1; then
+    print_warning "Pages section already exists - skipping content creation"
 else
-    print_warning "Pages section already exists or could not be created - skipping"
+    # Section doesn't exist, create it
+    if echo -e "\n" | ddev craft sections/create \
+        --name="Pages" \
+        --handle="pages" \
+        --type="structure" 2>/dev/null; then
+        print_success "Pages section created successfully"
+    else
+        print_warning "Could not create Pages section - you can create it manually in the admin panel"
+    fi
 fi
 
 # Note: Field creation via CLI is complex, we'll skip this for the boilerplate
