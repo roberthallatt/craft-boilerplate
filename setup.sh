@@ -325,40 +325,64 @@ EOF
 chmod +x craft
 
 # Install Craft CMS
-print_status "Installing Craft CMS..."
-ddev craft install --interactive=0 \
+print_status "Setting up Craft CMS..."
+if ddev craft install --interactive=0 \
     --username=admin \
     --password=password \
     --email=admin@example.com \
     --siteName="$PROJECT_NAME" \
     --siteUrl="https://$PROJECT_NAME.ddev.site" \
-    --language=en-US
+    --language=en-US 2>/dev/null; then
+    print_success "Craft CMS installed successfully"
+else
+    print_success "Craft CMS is already installed - continuing with setup"
+fi
 
 # Build assets
 print_status "Building initial assets..."
 npm run build
 
 # Install and enable plugins
-print_status "Installing Craft CMS plugins..."
+print_status "Setting up Craft CMS plugins..."
 
-# Try to install Vite plugin, if it fails, try to enable it
+# Check and setup Vite plugin
 print_status "Setting up Vite plugin..."
-if ddev craft plugin/install vite 2>/dev/null; then
-    print_success "Vite plugin installed successfully"
-elif ddev craft plugin/enable vite 2>/dev/null; then
-    print_success "Vite plugin enabled successfully"
+if ddev craft plugin/info vite 2>/dev/null | grep -q "enabled: true"; then
+    print_success "Vite plugin is already installed and enabled"
+elif ddev craft plugin/info vite 2>/dev/null | grep -q "installed: true"; then
+    # Plugin is installed but not enabled
+    if ddev craft plugin/enable vite 2>/dev/null; then
+        print_success "Vite plugin enabled successfully"
+    else
+        print_warning "Could not enable Vite plugin - check admin panel"
+    fi
 else
-    print_warning "Could not install or enable Vite plugin - check admin panel"
+    # Plugin is not installed, try to install it
+    if ddev craft plugin/install vite 2>/dev/null; then
+        print_success "Vite plugin installed successfully"
+    else
+        print_warning "Could not install Vite plugin - check admin panel"
+    fi
 fi
 
-# Try to install SEOmatic plugin, if it fails, try to enable it
+# Check and setup SEOmatic plugin
 print_status "Setting up SEOmatic plugin..."
-if ddev craft plugin/install seomatic 2>/dev/null; then
-    print_success "SEOmatic plugin installed successfully"
-elif ddev craft plugin/enable seomatic 2>/dev/null; then
-    print_success "SEOmatic plugin enabled successfully"
+if ddev craft plugin/info seomatic 2>/dev/null | grep -q "enabled: true"; then
+    print_success "SEOmatic plugin is already installed and enabled"
+elif ddev craft plugin/info seomatic 2>/dev/null | grep -q "installed: true"; then
+    # Plugin is installed but not enabled
+    if ddev craft plugin/enable seomatic 2>/dev/null; then
+        print_success "SEOmatic plugin enabled successfully"
+    else
+        print_warning "Could not enable SEOmatic plugin - check admin panel"
+    fi
 else
-    print_warning "Could not install or enable SEOmatic plugin - check admin panel"
+    # Plugin is not installed, try to install it
+    if ddev craft plugin/install seomatic 2>/dev/null; then
+        print_success "SEOmatic plugin installed successfully"
+    else
+        print_warning "Could not install SEOmatic plugin - check admin panel"
+    fi
 fi
 
 # Create some sample content (optional - can be done via admin panel)
