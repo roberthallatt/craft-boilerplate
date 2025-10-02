@@ -338,41 +338,31 @@ npm run build
 # Install and enable plugins
 print_status "Setting up Craft CMS plugins..."
 
-# Check and setup Vite plugin
-print_status "Setting up Vite plugin..."
-# Simply try to enable first (works if installed), then install if needed
+# Install plugins via Composer (more reliable than CLI)
+print_status "Installing plugins via Composer..."
+ddev composer install >/dev/null 2>&1
+
+# Try to enable plugins through Craft CLI
+print_status "Enabling Craft CMS plugins..."
+
+# Enable Vite plugin
 if ddev craft plugin/enable vite >/dev/null 2>&1; then
-    print_success "Vite plugin is ready and enabled"
-elif ddev craft plugin/install vite >/dev/null 2>&1; then
-    print_success "Vite plugin installed and enabled successfully"
+    print_success "Vite plugin enabled successfully"
 else
-    print_warning "Could not setup Vite plugin - it may already be enabled. Check admin panel if needed."
+    print_warning "Vite plugin installation may need manual activation in admin panel"
 fi
 
-# Check and setup SEOmatic plugin  
-print_status "Setting up SEOmatic plugin..."
-# Simply try to enable first (works if installed), then install if needed
+# Enable SEOmatic plugin  
 if ddev craft plugin/enable seomatic >/dev/null 2>&1; then
-    print_success "SEOmatic plugin is ready and enabled"
-elif ddev craft plugin/install seomatic >/dev/null 2>&1; then
-    print_success "SEOmatic plugin installed and enabled successfully"
+    print_success "SEOmatic plugin enabled successfully"
 else
-    print_warning "Could not setup SEOmatic plugin - it may already be enabled. Check admin panel if needed."
+    print_warning "SEOmatic plugin installation may need manual activation in admin panel"
 fi
 
-# Verify plugin installation
-print_status "Verifying plugin installation..."
-if ddev craft plugin/list 2>/dev/null | grep -q "vite.*enabled"; then
-    print_success "Vite plugin is properly enabled"
-else
-    print_warning "Vite plugin may not be enabled - check admin panel at /admin/settings/plugins"
-fi
-
-if ddev craft plugin/list 2>/dev/null | grep -q "seomatic.*enabled"; then
-    print_success "SEOmatic plugin is properly enabled"
-else
-    print_warning "SEOmatic plugin may not be enabled - check admin panel at /admin/settings/plugins"
-fi
+# Plugin setup complete
+print_status "Plugin setup complete"
+print_success "Plugins should be available in the admin panel at /admin/settings/plugins"
+print_success "If you see plugin errors, manually enable Vite and SEOmatic plugins in the admin panel"
 
 # Create some sample content (optional - can be done via admin panel)
 print_status "Sample content setup..."
@@ -385,7 +375,12 @@ print_success "Recommended: Create a 'Pages' section for your site structure"
 # Set proper permissions
 print_status "Setting proper permissions..."
 chmod -R 755 web/
-chmod -R 755 storage/
+# Only set storage permissions if directory exists
+if [ -d "storage" ]; then
+    chmod -R 755 storage/
+else
+    print_warning "Storage directory not found - will be created by Craft on first run"
+fi
 chmod +x setup.sh
 
 # Determine the correct protocol based on SSL setup
@@ -412,14 +407,21 @@ echo "   • Username: admin"
 echo "   • Password: password"
 echo ""
 echo "🛠️  Development commands:"
-echo "• npm run dev          - Start Vite dev server with HMR"
+echo "• npm run dev          - Start Vite dev server with HMR (recommended)"
 echo "• npm run build        - Build for production"
+echo "• npm run clear-cache  - Clear Craft caches"
 echo "• ddev start/stop      - Control DDEV environment"
 echo ""
 echo "📝 Development workflow:"
 echo "1. Run 'npm run dev' to start Vite dev server"
-echo "2. Visit https://$PROJECT_NAME.ddev.site for your site"
-echo "3. CSS/JS changes will hot-reload automatically"
+echo "2. Visit http://localhost:3000 for development (with HMR)"
+echo "3. Visit https://$PROJECT_NAME.ddev.site for the DDEV site"
+echo "4. CSS/JS/Template changes will auto-reload"
+echo ""
+echo "🔧 Post-setup tasks:"
+echo "• Check /admin/settings/plugins to ensure Vite and SEOmatic are enabled"
+echo "• Create content sections in /admin/settings/sections"
+echo "• Customize templates in the templates/ directory"
 echo ""
 echo "📁 Important files:"
 echo "• templates/           - Twig templates"
