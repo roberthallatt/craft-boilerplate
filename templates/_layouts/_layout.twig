@@ -25,25 +25,19 @@
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
  
-  {# Load assets - smart detection of dev server vs production #}
+  
+  {# Load assets - prioritize dev server when in development #}
   {% if craft.app.config.general.devMode %}
-    {# In development, always try dev server first #}
+    {# Development mode - load from dev server #}
     <script type="module" src="http://localhost:3000/@vite/client"></script>
     <script type="module" src="http://localhost:3000/src/js/app.js"></script>
   {% elseif craft.vite is defined %}
     {# Production mode with Vite plugin #}
     {{ craft.vite.script("src/js/app.js", false) }}
   {% else %}
-    {# Fallback when Vite plugin is not available #}
-    {% if craft.app.config.general.devMode %}
-      {# Development mode - load from Vite dev server #}
-      <script type="module" src="http://localhost:3000/@vite/client"></script>
-      <script type="module" src="http://localhost:3000/src/js/app.js"></script>
-    {% else %}
-      {# Production mode - load built assets manually #}
-      <script type="module" src="/assets/js/app.js"></script>
-      <link rel="stylesheet" href="/assets/css/app.css">
-    {% endif %}
+    {# Fallback - load built assets #}
+    <script type="module" src="/assets/js/app.js"></script>
+    <link rel="stylesheet" href="/assets/css/app.css">
   {% endif %}
 
   {# Critical CSS to prevent FOUC - inline in head #}

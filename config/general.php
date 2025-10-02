@@ -10,7 +10,7 @@
 
 use craft\helpers\App;
 
-$isDev = App::env('CRAFT_ENVIRONMENT') === 'development';
+$isDev = App::env('CRAFT_ENVIRONMENT') === 'development' || App::env('CRAFT_DEV_MODE') === 'true' || App::env('CRAFT_DEV_MODE') === true;
 $isProd = App::env('CRAFT_ENVIRONMENT') === 'production';
 
 $config = [

@@ -11,25 +11,25 @@ function templateWatcher() {
   return {
     name: 'template-watcher',
     configureServer(server) {
-      const templatesPath = resolve(__dirname, 'templates');
-      const configPath = resolve(__dirname, 'config');
+      const templatesPath = resolve(process.cwd(), 'templates');
+      const configPath = resolve(process.cwd(), 'config');
 
       // Watch templates and config directories
       server.watcher.add(templatesPath);
       server.watcher.add(configPath);
 
       server.watcher.on('change', (file) => {
-        const relativePath = file.replace(__dirname, '');
-        
+        const relativePath = file.replace(process.cwd(), '');
+
         // Only watch project templates, not vendor templates
-        if (file.includes('/templates/') && 
-            !file.includes('/vendor/') && 
+        if (file.includes('/templates/') &&
+            !file.includes('/vendor/') &&
             (file.endsWith('.twig') || file.endsWith('.html'))) {
           console.log(`🔄 Template changed: ${relativePath}`);
 
           // Invalidate CSS modules to trigger Tailwind rebuild
           const cssModules = server.moduleGraph.getModulesByFile(
-            resolve(__dirname, 'src/css/app.scss')
+            resolve(process.cwd(), 'src/css/app.scss')
           );
 
           if (cssModules) {
@@ -40,20 +40,20 @@ function templateWatcher() {
           }
 
           // Force full page reload for template changes
-          server.ws.send({ 
-            type: 'full-reload', 
-            path: '*' 
+          server.ws.send({
+            type: 'full-reload',
+            path: '*'
           });
         }
-        
+
         // Only watch project config changes, not vendor configs
-        if (file.includes('/config/') && 
-            !file.includes('/vendor/') && 
+        if (file.includes('/config/') &&
+            !file.includes('/vendor/') &&
             file.endsWith('.php')) {
           console.log(`⚙️  Config changed: ${relativePath} - Consider clearing Craft caches`);
-          server.ws.send({ 
-            type: 'full-reload', 
-            path: '*' 
+          server.ws.send({
+            type: 'full-reload',
+            path: '*'
           });
         }
       });
@@ -67,161 +67,182 @@ function templateWatcher() {
 }
 
 export default defineConfig(({ command, mode }) => {
-  // Load environment variables
+  // Load environment variables from .env file
   const env = loadEnv(mode, process.cwd(), '');
-  const isDev = command === 'serve' || mode === 'development' || process.env.NODE_ENV === 'development';
-  const hasCKEditorCss = fs.existsSync('src/css/ckeditor-content.css');
-  
-  // Get the target URL from environment or fallback to default
-  const rawTargetUrl = env.PRIMARY_SITE_URL || 'https://craftcms-boilerplate.ddev.site';
-  // Ensure we have a string and remove trailing slash to prevent double slashes
-  let targetUrl = String(rawTargetUrl).replace(/\/$/, '');
-  
-  // Validate the target URL
-  if (!targetUrl || !targetUrl.startsWith('http')) {
-    console.error(`❌ Invalid target URL: ${targetUrl}`);
-    console.log('🔧 Using fallback URL');
-    targetUrl = 'https://craftcms-boilerplate.ddev.site';
+
+  // Determine if we're in development mode
+  // Priority: command > NODE_ENV > mode > CRAFT_ENVIRONMENT
+  const isDev = command === 'serve' ||
+                (command !== 'build' && env.CRAFT_ENVIRONMENT === 'development') ||
+                env.NODE_ENV === 'development' ||
+                mode === 'development';
+
+  // Check if CKEditor CSS exists
+  const hasCKEditorCss = fs.existsSync(resolve(process.cwd(), 'src/css/ckeditor-content.css'));
+
+  // Get Vite dev server configuration from environment
+  const devServerUrl = env.VITE_DEV_SERVER_PUBLIC || 'http://localhost:3000';
+  const devServerPort = parseInt(devServerUrl.split(':').pop() || '3000', 10);
+
+  console.log(`📦 Vite running in ${isDev ? 'DEVELOPMENT' : 'PRODUCTION'} mode`);
+  console.log(`🔧 Command: ${command}, Mode: ${mode}`);
+  if (isDev) {
+    console.log(`🚀 Dev server will run on: ${devServerUrl}`);
   }
-  
-  console.log(`🎯 Vite will proxy to: ${targetUrl}`);
 
   return {
-    // Root directory - point to project root, not web folder
-    root: '.',
-    
-    // Server configuration
-    server: {
-      port: 3000,
-      strictPort: true,
-      open: true, // Automatically open browser
-      host: '0.0.0.0', // Allow external connections
-      // CORS and headers for development
-      cors: true,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    // Root directory - project root, not web folder
+    root: process.cwd(),
+
+    // Base public path - always use root
+    base: '/',
+
+    // Resolve configuration
+    resolve: {
+      alias: {
+        '@': resolve(process.cwd(), 'src'),
+        '@css': resolve(process.cwd(), 'src/css'),
+        '@js': resolve(process.cwd(), 'src/js'),
+        '@img': resolve(process.cwd(), 'src/img'),
       },
-      // HMR configuration
-      hmr: {
-        port: 3000,
-        overlay: true, // Show errors in browser overlay
-        timeout: 60000 // Increase timeout to prevent connection issues
-      },
-      // Proxy configuration - automatically detect DDEV project
-      proxy: {
-        // Proxy API and admin routes to DDEV
-        '^/(admin|api|cpresources|actions)': {
-          target: targetUrl,
-          changeOrigin: true,
-          secure: false,
-          ws: true
-        },
-        // Proxy all other requests except Vite assets
-        '^(?!/(src/|@vite/|@fs/|node_modules/)).*': {
-          target: targetUrl,
-          changeOrigin: true,
-          secure: false,
-          ws: true,
-          configure: (proxy, options) => {
-            proxy.on('proxyReq', (proxyReq, req, res) => {
-              // Log proxy requests for debugging (less verbose)
-              if (isDev && !req.url.includes('/assets/')) {
-                console.log(`Proxying: ${req.method} ${req.url} -> ${options.target}${req.url}`);
-              }
-            });
-            proxy.on('error', (err, req, res) => {
-              console.error(`Proxy error for ${req.url}:`, err.message);
-              // Try to send a response to prevent hanging
-              if (!res.headersSent) {
-                res.writeHead(502, { 'Content-Type': 'text/plain' });
-                res.end('Proxy Error: Could not connect to backend server');
-              }
-            });
-            proxy.on('proxyRes', (proxyRes, req, res) => {
-              // Handle proxy response errors
-              if (proxyRes.statusCode >= 400) {
-                console.warn(`Proxy response ${proxyRes.statusCode} for ${req.url}`);
-              }
-            });
-          }
-        }
-      }
     },
 
-    // Build configuration
+    // Development server configuration
+    server: {
+      host: 'localhost',
+      port: devServerPort,
+      strictPort: true,
+      open: false,
+      cors: {
+        origin: '*',
+        credentials: true,
+      },
+      hmr: {
+        host: 'localhost',
+        port: devServerPort,
+        protocol: 'ws',
+        overlay: true,
+      },
+      watch: {
+        usePolling: false,
+        ignored: [
+          '**/vendor/**',
+          '**/storage/**',
+          '**/web/cpresources/**',
+        ],
+      },
+    },
+
+    // Production build configuration
     build: {
       outDir: 'web',
       emptyOutDir: false,
       manifest: '.vite/manifest.json',
+      sourcemap: isDev,
+      minify: isDev ? false : 'terser',
+      cssMinify: !isDev,
       rollupOptions: {
         input: {
-          app: resolve(__dirname, 'src/js/app.js')
+          app: resolve(process.cwd(), 'src/js/app.js'),
         },
         output: {
           entryFileNames: 'assets/js/[name]-[hash].js',
-          assetFileNames: (assetInfo) => {
-            if (/\.(css)$/i.test(assetInfo.name)) {
-              return `assets/css/[name]-[hash][extname]`
-            }
-            if (/\.(png|jpe?g|gif|svg|webp|ico)$/i.test(assetInfo.name)) {
-              return `assets/img/[name]-[hash][extname]`
-            }
-            if (/\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name)) {
-              return `assets/fonts/[name]-[hash][extname]`
-            }
-            return `assets/[name]-[hash][extname]`
-          },
           chunkFileNames: 'assets/js/[name]-[hash].js',
+          assetFileNames: (assetInfo) => {
+            const name = assetInfo.name || '';
+
+            if (/\.(css)$/i.test(name)) {
+              return 'assets/css/[name]-[hash][extname]';
+            }
+            if (/\.(png|jpe?g|gif|svg|webp|ico|avif)$/i.test(name)) {
+              return 'assets/img/[name]-[hash][extname]';
+            }
+            if (/\.(woff2?|eot|ttf|otf)$/i.test(name)) {
+              return 'assets/fonts/[name]-[hash][extname]';
+            }
+
+            return 'assets/[name]-[hash][extname]';
+          },
         },
       },
-      assetsInclude: ['**/*.woff2', '**/*.woff', '**/*.ttf', '**/*.eot', '**/*.otf']
+      assetsInclude: [
+        '**/*.woff2',
+        '**/*.woff',
+        '**/*.ttf',
+        '**/*.eot',
+        '**/*.otf',
+      ],
+      // Optimize dependencies
+      commonjsOptions: {
+        include: [/node_modules/],
+      },
+      // Target modern browsers
+      target: 'es2020',
     },
 
-    // Public directory handling
+    // Public directory - static assets that don't need processing
     publicDir: 'web/public',
-    
+
+    // CSS configuration
     css: {
       postcss: {
         plugins: [
           tailwindcss(),
           autoprefixer(),
-        ]
+        ],
       },
-      devSourcemap: true
+      devSourcemap: isDev,
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
     },
-    
+
+    // Plugins
     plugins: [
-      // Custom plugin to watch templates and trigger CSS rebuild
-      templateWatcher(),
-      
-      // Watch config files and templates for CSS regeneration
-      ViteRestart({
+      // Template watcher (development only)
+      isDev && templateWatcher(),
+
+      // Config file watcher (development only)
+      isDev && ViteRestart({
         restart: [
           'tailwind.config.js',
-          'vite.config.js'
+          'vite.config.js',
         ],
         reload: [
           'templates/**/*.twig',
-          'templates/**/*.html'
-        ]
+          'templates/**/*.html',
+        ],
       }),
+
+      // Static asset copying
       viteStaticCopy({
         targets: [
-          // Sync all images from src/img to web/assets/img
-          { src: 'src/img/*', dest: 'assets/img' },
+          {
+            src: 'src/img/*',
+            dest: 'assets/img',
+          },
           // Copy CKEditor CSS if it exists
-          ...(
-            hasCKEditorCss
-              ? [{ src: 'src/css/ckeditor-content.css', dest: 'assets/css', rename: 'ckeditor-content.css' }]
-              : []
-          ),
+          ...(hasCKEditorCss ? [{
+            src: 'src/css/ckeditor-content.css',
+            dest: 'assets/css',
+            rename: 'ckeditor-content.css',
+          }] : []),
         ],
         watch: {
-          reloadPageOnChange: true
-        }
-      })
-    ]
-  }
-})
+          reloadPageOnChange: isDev,
+        },
+      }),
+    ].filter(Boolean),
+
+    // Optimize deps
+    optimizeDeps: {
+      include: ['alpinejs'],
+      exclude: [],
+    },
+
+    // Clear screen on dev server start
+    clearScreen: false,
+  };
+});

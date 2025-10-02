@@ -8,6 +8,7 @@
     "dev:host": "vite --host",
     "dev:fresh": "npm run clear-cache && vite",
     "build": "vite build",
+    "build:production": "NODE_ENV=production vite build",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
     "setup": "./setup.sh",
