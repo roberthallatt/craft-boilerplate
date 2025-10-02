@@ -208,17 +208,8 @@ else
     VITE_HTTPS_ENABLED="false"
 fi
 
-# Update Craft Vite configuration
-print_status "Updating Craft Vite configuration..."
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS
-    sed -i '' "s|VITE_DEV_SERVER_PUBLIC_PLACEHOLDER|$VITE_DEV_SERVER_PUBLIC|" config/vite.php
-    sed -i '' "s|VITE_DEV_SERVER_INTERNAL_PLACEHOLDER|$VITE_DEV_SERVER_INTERNAL|" config/vite.php
-else
-    # Linux
-    sed -i "s|VITE_DEV_SERVER_PUBLIC_PLACEHOLDER|$VITE_DEV_SERVER_PUBLIC|" config/vite.php
-    sed -i "s|VITE_DEV_SERVER_INTERNAL_PLACEHOLDER|$VITE_DEV_SERVER_INTERNAL|" config/vite.php
-fi
+# Vite configuration is now handled via environment variables in .env file
+print_status "Vite configuration will use environment variables from .env file"
 
 # Update DDEV configuration with custom project name
 print_status "Configuring DDEV with project name: $PROJECT_NAME"

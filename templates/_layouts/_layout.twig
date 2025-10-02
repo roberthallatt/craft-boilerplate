@@ -25,16 +25,9 @@
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
  
-  {# Load assets based on environment - dev server or production build #}
-  {% if craft.app.config.general.devMode %}
-    {# Development mode - load from Vite dev server #}
-    <script type="module" src="http://localhost:3000/@vite/client"></script>
-    <script type="module" src="http://localhost:3000/src/js/app.js"></script>
-  {% else %}
-    {# Production mode - load built assets using Vite plugin #}
-    {{ craft.vite.script("src/js/app.js") }}
-    {{ craft.vite.style("src/js/app.js") }}
-  {% endif %}
+  {# Load assets using Vite plugin - handles dev server and production builds automatically #}
+  {{ craft.vite.script("src/js/app.js") }}
+  {{ craft.vite.style("src/js/app.js") }}
 
   {# Critical CSS to prevent FOUC - inline in head #}
   <style>
