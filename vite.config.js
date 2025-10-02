@@ -74,8 +74,15 @@ export default defineConfig(({ command, mode }) => {
   
   // Get the target URL from environment or fallback to default
   const rawTargetUrl = env.PRIMARY_SITE_URL || 'https://craftcms-boilerplate.ddev.site';
-  // Remove trailing slash to prevent double slashes
-  const targetUrl = rawTargetUrl.replace(/\/$/, '');
+  // Ensure we have a string and remove trailing slash to prevent double slashes
+  let targetUrl = String(rawTargetUrl).replace(/\/$/, '');
+  
+  // Validate the target URL
+  if (!targetUrl || !targetUrl.startsWith('http')) {
+    console.error(`❌ Invalid target URL: ${targetUrl}`);
+    console.log('🔧 Using fallback URL');
+    targetUrl = 'https://craftcms-boilerplate.ddev.site';
+  }
   
   console.log(`🎯 Vite will proxy to: ${targetUrl}`);
 
@@ -99,7 +106,8 @@ export default defineConfig(({ command, mode }) => {
       // HMR configuration
       hmr: {
         port: 3000,
-        overlay: true // Show errors in browser overlay
+        overlay: true, // Show errors in browser overlay
+        timeout: 60000 // Increase timeout to prevent connection issues
       },
       // Proxy configuration - automatically detect DDEV project
       proxy: {
@@ -118,13 +126,24 @@ export default defineConfig(({ command, mode }) => {
           ws: true,
           configure: (proxy, options) => {
             proxy.on('proxyReq', (proxyReq, req, res) => {
-              // Log proxy requests for debugging
-              if (isDev) {
+              // Log proxy requests for debugging (less verbose)
+              if (isDev && !req.url.includes('/assets/')) {
                 console.log(`Proxying: ${req.method} ${req.url} -> ${options.target}${req.url}`);
               }
             });
             proxy.on('error', (err, req, res) => {
-              console.error('Proxy error:', err.message);
+              console.error(`Proxy error for ${req.url}:`, err.message);
+              // Try to send a response to prevent hanging
+              if (!res.headersSent) {
+                res.writeHead(502, { 'Content-Type': 'text/plain' });
+                res.end('Proxy Error: Could not connect to backend server');
+              }
+            });
+            proxy.on('proxyRes', (proxyRes, req, res) => {
+              // Handle proxy response errors
+              if (proxyRes.statusCode >= 400) {
+                console.warn(`Proxy response ${proxyRes.statusCode} for ${req.url}`);
+              }
             });
           }
         }
