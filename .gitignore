@@ -9,6 +9,8 @@
 # Build artifacts
 /web/dist/
 /web/cpresources/
+/web/assets/
+/web/.vite/
 
 # Node.js
 /node_modules/

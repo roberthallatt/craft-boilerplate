@@ -340,8 +340,30 @@ npm run build
 
 # Install and enable plugins
 print_status "Installing Craft CMS plugins..."
-ddev craft plugin/install vite
-ddev craft plugin/install seomatic
+
+# Check if Vite plugin is already installed, if not install it
+if ! ddev craft plugin --list | grep -q "vite"; then
+    print_status "Installing Vite plugin..."
+    ddev craft plugin/install vite || {
+        print_warning "Vite plugin installation failed - it may already be installed"
+        print_status "Attempting to enable Vite plugin..."
+        ddev craft plugin/enable vite || print_warning "Could not enable Vite plugin - check admin panel"
+    }
+else
+    print_success "Vite plugin is already installed"
+fi
+
+# Check if SEOmatic plugin is already installed, if not install it
+if ! ddev craft plugin --list | grep -q "seomatic"; then
+    print_status "Installing SEOmatic plugin..."
+    ddev craft plugin/install seomatic || {
+        print_warning "SEOmatic plugin installation failed - it may already be installed"
+        print_status "Attempting to enable SEOmatic plugin..."
+        ddev craft plugin/enable seomatic || print_warning "Could not enable SEOmatic plugin - check admin panel"
+    }
+else
+    print_success "SEOmatic plugin is already installed"
+fi
 
 # Create some sample content
 print_status "Creating sample content..."
