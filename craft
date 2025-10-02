@@ -1,10 +1,11 @@
+#!/usr/bin/env php
 <?php
 /**
- * Craft web bootstrap file
+ * Craft console bootstrap file
  */
 
 // Set path constants
-define('CRAFT_BASE_PATH', dirname(__DIR__));
+define('CRAFT_BASE_PATH', __DIR__);
 define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH.'/vendor');
 
 // Load Composer's autoloader
@@ -18,5 +19,6 @@ if (class_exists('Dotenv\Dotenv') && file_exists(CRAFT_BASE_PATH.'/.env')) {
 
 // Load and run Craft
 define('CRAFT_ENVIRONMENT', $_ENV['CRAFT_ENVIRONMENT'] ?? $_SERVER['CRAFT_ENVIRONMENT'] ?? 'production');
-$app = require CRAFT_VENDOR_PATH.'/craftcms/cms/bootstrap/web.php';
-$app->run();
+$app = require CRAFT_VENDOR_PATH.'/craftcms/cms/bootstrap/console.php';
+$exitCode = $app->run();
+exit($exitCode);

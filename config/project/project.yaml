@@ -1,0 +1,34 @@
+dateModified: 1759328823
+email:
+  fromEmail: admin@example.com
+  fromName: mycraftboiler
+  transportType: craft\mail\transportadapters\Sendmail
+meta:
+  __names__:
+    1f2e39a8-6965-4ef8-b521-f9572d3a57f3: mycraftboiler # mycraftboiler
+    6e7ba022-dc94-4c96-b297-bf96fa02cb53: Page # Page
+    6f481b1c-a9f8-4185-8d2a-27c63e8c81e5: mycraftboiler # mycraftboiler
+    0953e6a6-8c6b-45ae-b859-7a3cdc0fb620: Pages # Pages
+plugins:
+  seomatic:
+    edition: standard
+    enabled: true
+    licenseKey: DP9ADR14KUB4DATTBRA7KGLJ
+    schemaVersion: 3.0.13
+  vite:
+    edition: standard
+    enabled: true
+    schemaVersion: 1.0.0
+system:
+  edition: solo
+  live: true
+  name: mycraftboiler
+  schemaVersion: 5.8.0.3
+  timeZone: America/Los_Angeles
+users:
+  allowPublicRegistration: false
+  defaultGroup: null
+  photoSubpath: null
+  photoVolumeUid: null
+  require2fa: false
+  requireEmailVerification: true

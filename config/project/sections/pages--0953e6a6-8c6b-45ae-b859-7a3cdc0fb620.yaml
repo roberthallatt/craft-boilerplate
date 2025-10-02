@@ -1,0 +1,19 @@
+defaultPlacement: end
+enableVersioning: true
+entryTypes:
+  -
+    uid: 6e7ba022-dc94-4c96-b297-bf96fa02cb53 # Page
+handle: pages
+maxAuthors: 1
+name: Pages
+propagationMethod: all
+siteSettings:
+  6f481b1c-a9f8-4185-8d2a-27c63e8c81e5: # mycraftboiler
+    enabledByDefault: true
+    hasUrls: false
+    template: null
+    uriFormat: null
+structure:
+  maxLevels: null
+  uid: 567fb579-244a-41df-af7b-184b35a46a28
+type: structure

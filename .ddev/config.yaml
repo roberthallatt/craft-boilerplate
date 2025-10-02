@@ -1,4 +1,4 @@
-name: craftcms-boilerplate
+name: mycraftboiler
 type: craftcms
 docroot: web
 php_version: "8.3"
