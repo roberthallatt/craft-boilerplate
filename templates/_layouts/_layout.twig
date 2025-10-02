@@ -25,8 +25,8 @@
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
  
-  {# Load assets based on environment and Vite plugin availability #}
-  {% if craft.plugins.isPluginEnabled('vite') %}
+  {# Load assets - try Vite plugin first, fallback to manual loading #}
+  {% if craft.vite is defined %}
     {# Vite plugin is available - use it for both dev and production #}
     {# Load CSS synchronously (false) to avoid FOUC since we have critical CSS #}
     {{ craft.vite.script("src/js/app.js", false) }}
@@ -34,23 +34,12 @@
     {# Fallback when Vite plugin is not available #}
     {% if craft.app.config.general.devMode %}
       {# Development mode - load from Vite dev server #}
-      <script type="module" src="{{ craft.app.config.custom.viteDevServerPublic ?: 'http://localhost:3000' }}/@vite/client"></script>
-      <script type="module" src="{{ craft.app.config.custom.viteDevServerPublic ?: 'http://localhost:3000' }}/src/js/app.js"></script>
+      <script type="module" src="http://localhost:3000/@vite/client"></script>
+      <script type="module" src="http://localhost:3000/src/js/app.js"></script>
     {% else %}
       {# Production mode - load built assets manually #}
-      {% set manifest = craft.app.assetManager.getPublishedPath('@webroot/.vite/manifest.json') %}
-      {% if manifest and manifest|file_exists %}
-        {% set manifestData = manifest|file_get_contents|json_decode %}
-        {% if manifestData['src/js/app.js'] is defined %}
-          {% set entry = manifestData['src/js/app.js'] %}
-          <script type="module" src="/{{ entry.file }}"></script>
-          {% if entry.css is defined %}
-            {% for cssFile in entry.css %}
-              <link rel="stylesheet" href="/{{ cssFile }}">
-            {% endfor %}
-          {% endif %}
-        {% endif %}
-      {% endif %}
+      <script type="module" src="/assets/js/app.js"></script>
+      <link rel="stylesheet" href="/assets/css/app.css">
     {% endif %}
   {% endif %}
 

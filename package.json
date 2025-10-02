@@ -4,10 +4,9 @@
   "description": "Craft CMS boilerplate with Vite, TailwindCSS, and Alpine.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run build:watch\" \"npm run dev:sync\"",
-    "dev:vite": "vite",
+    "dev": "vite",
     "dev:host": "vite --host",
-    "dev:sync": "browser-sync start --config bs-config.cjs",
+    "dev:fresh": "npm run clear-cache && vite",
     "build": "vite build",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
@@ -16,7 +15,8 @@
     "ddev:stop": "ddev stop",
     "craft:install": "ddev craft install",
     "lint:css": "stylelint \"src/**/*.{css,scss}\"",
-    "lint:css:fix": "stylelint \"src/**/*.{css,scss}\" --fix"
+    "lint:css:fix": "stylelint \"src/**/*.{css,scss}\" --fix",
+    "clear-cache": "ddev craft clear-caches/all"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",

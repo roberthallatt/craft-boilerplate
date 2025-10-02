@@ -34,16 +34,13 @@ $config = [
     'aliases' => [
         '@webroot' => dirname(__DIR__) . '/web',
     ],
-    
-    // Custom config values for templates
-    'custom' => [
-        'viteDevServerPublic' => App::env('VITE_DEV_SERVER_PUBLIC') ?: 'http://localhost:3000',
-    ],
 ];
 
 // Add environment-specific settings
 if ($isDev) {
     $config['enableTemplateCaching'] = false;
+    $config['cacheElementQueries'] = false;
+    $config['cacheDuration'] = 0;
     $config['testToEmailAddress'] = 'test@example.com';
     
     // Performance optimizations for development

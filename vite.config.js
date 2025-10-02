@@ -12,28 +12,50 @@ function templateWatcher() {
     name: 'template-watcher',
     configureServer(server) {
       const templatesPath = resolve(__dirname, 'templates');
+      const configPath = resolve(__dirname, 'config');
 
+      // Watch templates and config directories
       server.watcher.add(templatesPath);
+      server.watcher.add(configPath);
 
       server.watcher.on('change', (file) => {
-        if (file.includes('/templates/') && file.endsWith('.twig')) {
-          console.log(`Template changed: ${file}`);
+        const relativePath = file.replace(__dirname, '');
+        
+        if (file.includes('/templates/') && (file.endsWith('.twig') || file.endsWith('.html'))) {
+          console.log(`🔄 Template changed: ${relativePath}`);
 
-          // Find and invalidate all CSS modules
-          const modules = server.moduleGraph.getModulesByFile(
+          // Invalidate CSS modules to trigger Tailwind rebuild
+          const cssModules = server.moduleGraph.getModulesByFile(
             resolve(__dirname, 'src/css/app.scss')
           );
 
-          if (modules) {
-            modules.forEach(mod => {
+          if (cssModules) {
+            cssModules.forEach(mod => {
               server.moduleGraph.invalidateModule(mod);
             });
-            console.log('CSS invalidated, Tailwind will rescan templates');
+            console.log('🎨 CSS invalidated - Tailwind will rescan templates');
           }
 
-          // Force full reload
-          server.ws.send({ type: 'full-reload', path: '*' });
+          // Force full page reload for template changes
+          server.ws.send({ 
+            type: 'full-reload', 
+            path: '*' 
+          });
         }
+        
+        // Watch config changes for cache clearing
+        if (file.includes('/config/') && file.endsWith('.php')) {
+          console.log(`⚙️  Config changed: ${relativePath} - Consider clearing Craft caches`);
+          server.ws.send({ 
+            type: 'full-reload', 
+            path: '*' 
+          });
+        }
+      });
+
+      // Add custom HMR update for better feedback
+      server.ws.on('vite:beforeUpdate', (payload) => {
+        console.log(`🔥 HMR Update: ${payload.updates.map(u => u.path).join(', ')}`);
       });
     }
   }
@@ -51,31 +73,46 @@ export default defineConfig(({ command, mode }) => {
     server: {
       port: 3000,
       strictPort: true,
-      open: false,
-      // Disable HTTPS for now to avoid certificate issues
-      https: false,
-      // Allow all origins and methods
+      open: true, // Automatically open browser
+      host: '0.0.0.0', // Allow external connections
+      // CORS and headers for development
+      cors: true,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
-      cors: true,
-      // HMR configuration - use WebSocket for HTTP
+      // HMR configuration
       hmr: {
-        protocol: 'ws',
-        host: 'localhost',
         port: 3000,
-        clientPort: 3000,
-        timeout: 120000,
-        overlay: false
+        overlay: true // Show errors in browser overlay
       },
-      // Proxy all requests not handled by Vite to the CMS
+      // Proxy configuration - automatically detect DDEV project
       proxy: {
-        '^(?!/(@vite|src|node_modules))': {
-          target: 'https://localhost',
+        // Proxy API and admin routes to DDEV
+        '^/(admin|api|cpresources|actions)': {
+          target: process.env.PRIMARY_SITE_URL || 'https://craftcms-boilerplate.ddev.site',
           changeOrigin: true,
-          secure: false
+          secure: false,
+          ws: true
+        },
+        // Proxy all other requests except Vite assets
+        '^(?!/(src/|@vite/|@fs/|node_modules/)).*': {
+          target: process.env.PRIMARY_SITE_URL || 'https://craftcms-boilerplate.ddev.site',
+          changeOrigin: true,
+          secure: false,
+          ws: true,
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              // Log proxy requests for debugging
+              if (isDev) {
+                console.log(`Proxying: ${req.method} ${req.url} -> ${options.target}${req.url}`);
+              }
+            });
+            proxy.on('error', (err, req, res) => {
+              console.error('Proxy error:', err.message);
+            });
+          }
         }
       }
     },

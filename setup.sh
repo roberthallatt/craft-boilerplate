@@ -238,11 +238,13 @@ if [ ! -f ".env" ]; then
         sed -i '' "s|CRAFT_SECURITY_KEY=|CRAFT_SECURITY_KEY=$SECURITY_KEY|" .env
         sed -i '' "s|CRAFT_COOKIE_VALIDATION_KEY=|CRAFT_COOKIE_VALIDATION_KEY=$COOKIE_KEY|" .env
         sed -i '' "s|CRAFT_APP_ID=|CRAFT_APP_ID=$APP_ID|" .env
+        sed -i '' "s|PRIMARY_SITE_URL=https://craftcms-boilerplate.ddev.site|PRIMARY_SITE_URL=https://$PROJECT_NAME.ddev.site|" .env
     else
         # Linux
         sed -i "s|CRAFT_SECURITY_KEY=|CRAFT_SECURITY_KEY=$SECURITY_KEY|" .env
         sed -i "s|CRAFT_COOKIE_VALIDATION_KEY=|CRAFT_COOKIE_VALIDATION_KEY=$COOKIE_KEY|" .env
         sed -i "s|CRAFT_APP_ID=|CRAFT_APP_ID=$APP_ID|" .env
+        sed -i "s|PRIMARY_SITE_URL=https://craftcms-boilerplate.ddev.site|PRIMARY_SITE_URL=https://$PROJECT_NAME.ddev.site|" .env
     fi
     
     print_success ".env file created with generated keys"
@@ -401,13 +403,8 @@ echo "🎉 Your Craft CMS site is ready!"
 echo "======================================"
 echo ""
 echo "🌐 Access your site:"
-if [ "$VITE_HTTPS_ENABLED" = "true" ]; then
-    echo "   • https://$PROJECT_NAME.ddev.site (Main site - ✅ Trusted SSL)"
-    echo "   • $VITE_URL (Vite dev server - ✅ Trusted SSL)"
-else
-    echo "   • https://$PROJECT_NAME.ddev.site (Main site - ⚠️ Browser warnings)"
-    echo "   • $VITE_URL (Vite dev server - HTTP only)"
-fi
+echo "   • https://$PROJECT_NAME.ddev.site (DDEV site)"
+echo "   • http://localhost:3000 (Vite dev server with HMR - recommended for development)"
 echo ""
 echo "🔐 Admin panel:"
 echo "   • https://$PROJECT_NAME.ddev.site/admin"
