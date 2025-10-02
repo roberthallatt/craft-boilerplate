@@ -1,10 +1,10 @@
-name: mycraftboiler
+name: craftcms-boilerplate
 type: craftcms
 docroot: web
 php_version: "8.3"
 webserver_type: nginx-fpm
 xdebug_enabled: false
-performance_mode: none
+performance_mode: mutagen
 disable_upload_dirs_warning: true
 additional_hostnames: 
 - localhost

@@ -1,8 +1,14 @@
 // Import CSS for Vite to handle
 import '../css/app.scss';
 
-// Alpine.js will be loaded via CDN in the template
-// This file can contain your custom JavaScript
+// Import and initialize Alpine.js
+import Alpine from 'alpinejs';
+
+// Make Alpine available globally
+window.Alpine = Alpine;
+
+// Start Alpine
+Alpine.start();
 
 console.log('🚀 Craft CMS Boilerplate loaded!');
 

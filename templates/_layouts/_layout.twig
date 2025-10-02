@@ -25,9 +25,16 @@
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
  
-  {# Force direct loading from Vite dev server - bypass Craft plugin completely #}
-  <script type="module" src="http://localhost:3000/@vite/client"></script>
-  <script type="module" src="http://localhost:3000/src/js/app.js"></script>
+  {# Load assets based on environment - dev server or production build #}
+  {% if craft.app.config.general.devMode %}
+    {# Development mode - load from Vite dev server #}
+    <script type="module" src="http://localhost:3000/@vite/client"></script>
+    <script type="module" src="http://localhost:3000/src/js/app.js"></script>
+  {% else %}
+    {# Production mode - load built assets using Vite plugin #}
+    {{ craft.vite.script("src/js/app.js") }}
+    {{ craft.vite.style("src/js/app.js") }}
+  {% endif %}
 
   {# Critical CSS to prevent FOUC - inline in head #}
   <style>
@@ -51,7 +58,7 @@
       }, 50);
     });
   </script>
-  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  {# Alpine.js is now bundled in app.js for both dev and production #}
   
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100">

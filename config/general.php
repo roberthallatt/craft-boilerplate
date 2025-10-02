@@ -50,7 +50,7 @@ if ($isDev) {
 }
 
 if ($isProd) {
-    $config['enableTemplateCaching'] = true;
+    // $config['enableTemplateCaching'] = true;
     $config['allowUpdates'] = false;
 }
 
