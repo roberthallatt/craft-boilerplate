@@ -5,7 +5,6 @@ import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 import ViteRestart from 'vite-plugin-restart';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import basicSsl from '@vitejs/plugin-basic-ssl';
 
 // Custom plugin to watch templates and trigger CSS rebuild
 function templateWatcher() {
