@@ -358,6 +358,20 @@ else
     print_warning "Could not setup SEOmatic plugin - it may already be enabled. Check admin panel if needed."
 fi
 
+# Verify plugin installation
+print_status "Verifying plugin installation..."
+if ddev craft plugin/list 2>/dev/null | grep -q "vite.*enabled"; then
+    print_success "Vite plugin is properly enabled"
+else
+    print_warning "Vite plugin may not be enabled - check admin panel at /admin/settings/plugins"
+fi
+
+if ddev craft plugin/list 2>/dev/null | grep -q "seomatic.*enabled"; then
+    print_success "SEOmatic plugin is properly enabled"
+else
+    print_warning "SEOmatic plugin may not be enabled - check admin panel at /admin/settings/plugins"
+fi
+
 # Create some sample content (optional - can be done via admin panel)
 print_status "Sample content setup..."
 print_success "Content structure can be created via the admin panel at /admin"
