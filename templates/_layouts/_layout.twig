@@ -25,10 +25,13 @@
   {# Favicon #}
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
  
-  {# Load assets - try Vite plugin first, fallback to manual loading #}
-  {% if craft.vite is defined %}
-    {# Vite plugin is available - use it for both dev and production #}
-    {# Load CSS synchronously (false) to avoid FOUC since we have critical CSS #}
+  {# Load assets - smart detection of dev server vs production #}
+  {% if craft.app.config.general.devMode %}
+    {# In development, always try dev server first #}
+    <script type="module" src="http://localhost:3000/@vite/client"></script>
+    <script type="module" src="http://localhost:3000/src/js/app.js"></script>
+  {% elseif craft.vite is defined %}
+    {# Production mode with Vite plugin #}
     {{ craft.vite.script("src/js/app.js", false) }}
   {% else %}
     {# Fallback when Vite plugin is not available #}
