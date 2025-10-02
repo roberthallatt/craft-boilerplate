@@ -139,7 +139,7 @@ export default defineConfig(({ command, mode }) => {
       }),
       viteStaticCopy({
         targets: [
-          // Sync all images from src/img to web/dist/assets/img
+          // Sync all images from src/img to web/assets/img
           { src: 'src/img/*', dest: 'assets/img' },
           // Copy CKEditor CSS if it exists
           ...(

@@ -332,10 +332,10 @@ if ddev craft install --interactive=0 \
     --email=admin@example.com \
     --siteName="$PROJECT_NAME" \
     --siteUrl="https://$PROJECT_NAME.ddev.site" \
-    --language=en-US 2>/dev/null; then
+    --language=en-US >/dev/null 2>&1; then
     print_success "Craft CMS installed successfully"
 else
-    print_success "Craft CMS is already installed - continuing with setup"
+    print_success "Craft CMS is already set up - continuing with configuration"
 fi
 
 # Build assets
