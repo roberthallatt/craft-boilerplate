@@ -15,15 +15,12 @@ database:
 use_dns_when_possible: true
 composer_version: "2"
 web_environment:
-- CRAFT_SECURITY_KEY=
 - CRAFT_DB_DRIVER=mysql
 - CRAFT_DB_SERVER=db
 - CRAFT_DB_PORT=3306
 - CRAFT_DB_DATABASE=db
 - CRAFT_DB_USER=db
 - CRAFT_DB_PASSWORD=db
-- CRAFT_DB_SCHEMA=
-- CRAFT_DB_TABLE_PREFIX=
 
 # Override the default nginx configuration
 nginx_config_overrides:
