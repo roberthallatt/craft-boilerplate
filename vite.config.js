@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'path';
 import fs from 'fs';
 import tailwindcss from 'tailwindcss';
@@ -21,7 +21,10 @@ function templateWatcher() {
       server.watcher.on('change', (file) => {
         const relativePath = file.replace(__dirname, '');
         
-        if (file.includes('/templates/') && (file.endsWith('.twig') || file.endsWith('.html'))) {
+        // Only watch project templates, not vendor templates
+        if (file.includes('/templates/') && 
+            !file.includes('/vendor/') && 
+            (file.endsWith('.twig') || file.endsWith('.html'))) {
           console.log(`🔄 Template changed: ${relativePath}`);
 
           // Invalidate CSS modules to trigger Tailwind rebuild
@@ -43,8 +46,10 @@ function templateWatcher() {
           });
         }
         
-        // Watch config changes for cache clearing
-        if (file.includes('/config/') && file.endsWith('.php')) {
+        // Only watch project config changes, not vendor configs
+        if (file.includes('/config/') && 
+            !file.includes('/vendor/') && 
+            file.endsWith('.php')) {
           console.log(`⚙️  Config changed: ${relativePath} - Consider clearing Craft caches`);
           server.ws.send({ 
             type: 'full-reload', 
@@ -62,8 +67,17 @@ function templateWatcher() {
 }
 
 export default defineConfig(({ command, mode }) => {
+  // Load environment variables
+  const env = loadEnv(mode, process.cwd(), '');
   const isDev = command === 'serve' || mode === 'development' || process.env.NODE_ENV === 'development';
   const hasCKEditorCss = fs.existsSync('src/css/ckeditor-content.css');
+  
+  // Get the target URL from environment or fallback to default
+  const rawTargetUrl = env.PRIMARY_SITE_URL || 'https://craftcms-boilerplate.ddev.site';
+  // Remove trailing slash to prevent double slashes
+  const targetUrl = rawTargetUrl.replace(/\/$/, '');
+  
+  console.log(`🎯 Vite will proxy to: ${targetUrl}`);
 
   return {
     // Root directory - point to project root, not web folder
@@ -91,14 +105,14 @@ export default defineConfig(({ command, mode }) => {
       proxy: {
         // Proxy API and admin routes to DDEV
         '^/(admin|api|cpresources|actions)': {
-          target: process.env.PRIMARY_SITE_URL || 'https://craftcms-boilerplate.ddev.site',
+          target: targetUrl,
           changeOrigin: true,
           secure: false,
           ws: true
         },
         // Proxy all other requests except Vite assets
         '^(?!/(src/|@vite/|@fs/|node_modules/)).*': {
-          target: process.env.PRIMARY_SITE_URL || 'https://craftcms-boilerplate.ddev.site',
+          target: targetUrl,
           changeOrigin: true,
           secure: false,
           ws: true,

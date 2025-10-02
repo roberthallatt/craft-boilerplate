@@ -39,8 +39,6 @@ $config = [
 // Add environment-specific settings
 if ($isDev) {
     $config['enableTemplateCaching'] = false;
-    $config['cacheElementQueries'] = false;
-    $config['cacheDuration'] = 0;
     $config['testToEmailAddress'] = 'test@example.com';
     
     // Performance optimizations for development
