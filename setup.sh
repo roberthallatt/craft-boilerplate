@@ -341,36 +341,36 @@ npm run build
 # Install and enable plugins
 print_status "Installing Craft CMS plugins..."
 
-# Check if Vite plugin is already installed, if not install it
-if ! ddev craft plugin --list | grep -q "vite"; then
-    print_status "Installing Vite plugin..."
-    ddev craft plugin/install vite || {
-        print_warning "Vite plugin installation failed - it may already be installed"
-        print_status "Attempting to enable Vite plugin..."
-        ddev craft plugin/enable vite || print_warning "Could not enable Vite plugin - check admin panel"
-    }
+# Try to install Vite plugin, if it fails, try to enable it
+print_status "Setting up Vite plugin..."
+if ddev craft plugin/install vite 2>/dev/null; then
+    print_success "Vite plugin installed successfully"
+elif ddev craft plugin/enable vite 2>/dev/null; then
+    print_success "Vite plugin enabled successfully"
 else
-    print_success "Vite plugin is already installed"
+    print_warning "Could not install or enable Vite plugin - check admin panel"
 fi
 
-# Check if SEOmatic plugin is already installed, if not install it
-if ! ddev craft plugin --list | grep -q "seomatic"; then
-    print_status "Installing SEOmatic plugin..."
-    ddev craft plugin/install seomatic || {
-        print_warning "SEOmatic plugin installation failed - it may already be installed"
-        print_status "Attempting to enable SEOmatic plugin..."
-        ddev craft plugin/enable seomatic || print_warning "Could not enable SEOmatic plugin - check admin panel"
-    }
+# Try to install SEOmatic plugin, if it fails, try to enable it
+print_status "Setting up SEOmatic plugin..."
+if ddev craft plugin/install seomatic 2>/dev/null; then
+    print_success "SEOmatic plugin installed successfully"
+elif ddev craft plugin/enable seomatic 2>/dev/null; then
+    print_success "SEOmatic plugin enabled successfully"
 else
-    print_success "SEOmatic plugin is already installed"
+    print_warning "Could not install or enable SEOmatic plugin - check admin panel"
 fi
 
 # Create some sample content
 print_status "Creating sample content..."
-ddev craft sections/create \
+if ddev craft sections/create \
     --name="Pages" \
     --handle="pages" \
-    --type="structure"
+    --type="structure" 2>/dev/null; then
+    print_success "Pages section created successfully"
+else
+    print_warning "Pages section already exists or could not be created - skipping"
+fi
 
 # Note: Field creation via CLI is complex, we'll skip this for the boilerplate
 # Users can create fields through the admin panel
