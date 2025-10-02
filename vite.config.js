@@ -151,8 +151,7 @@ export default defineConfig(({ command, mode }) => {
         watch: {
           reloadPageOnChange: true
         }
-      }),
-      basicSsl()
+      })
     ]
   }
 })
